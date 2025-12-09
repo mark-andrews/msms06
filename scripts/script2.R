@@ -13,3 +13,6 @@ formulas <- list(
 models <- map(formulas, ~ lm(.x, data = swiss))
 
 train_rmse <- map_dbl(models, ~ get_rmse(.x, data = swiss))
+
+set.seed(42)
+cv_rmse <- map_dbl(formulas, ~ cv_rmse(.x, data = swiss, k = 10))
