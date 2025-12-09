@@ -39,3 +39,7 @@ formulas <- list(
   m4 <- Fertility ~ Education + Catholic + Agriculture,
   m5 <- Fertility ~ Education + Catholic + Infant.Mortality + Agriculture
 )
+
+models <- map(formulas, ~ lm(.x, data = swiss))
+
+model_table(models)
