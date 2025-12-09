@@ -85,4 +85,9 @@ We demonstrate that models selected by AIC or other statistical criteria may hav
 The session concludes with guidance on transparent reporting practices, pre-registration of model selection strategies, and validation on independent data.
 These practices address the replication crisis by reducing selective reporting and p-hacking.
 
+# Software
+
+```r
+devtools::install_github("mark-andrews/msmsr-pkg")
+```
 
