@@ -15,3 +15,11 @@ ggplot(ames, aes(x = area, y = price)) +
 degrees <- 1:15
 
 models <- map(degrees, ~ poly_reg(ames_split$train, "price", "area", .x))
+
+# calculate rmse using training data
+rmse_train <- map_dbl(models, ~ get_rmse(.x, data = ames_split$train))
+plot(rmse_train)
+
+rmse_test <- map_dbl(models, ~ get_rmse(.x, data = ames_split$test))
+plot(rmse_test)
+plot(rmse_test[1:10])
