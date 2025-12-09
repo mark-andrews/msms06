@@ -1,7 +1,5 @@
----
-title: "Model Selection and Model Simplification"
-subtitle: "A Two-Day Workshop for Empirical Researchers"
----
+# Model Selection and Model Simplification
+## A Two-Day Workshop for Empirical Researchers
 
 This two-day workshop provides practical training in statistical model building, evaluation, comparison, and selection for researchers working with observational data.
 The course addresses common challenges faced when analyzing data with multiple potential predictors, limited sample sizes, and competing theoretical models.
@@ -32,7 +30,7 @@ Demonstrations use simulation studies where the true model is known, allowing cl
 
 Session 2 addresses how to honestly evaluate model performance using held-out data and information criteria.
 
-We examine why in-sample fit statistics such as $R^2$ and residual deviance are optimistically biased and misleading for model comparison.
+We examine why in-sample fit statistics such as R^2 and residual deviance are optimistically biased and misleading for model comparison.
 The session introduces cross-validation methods including k-fold cross-validation and leave-one-out cross-validation.
 
 Information criteria including AIC, AICc, and BIC are presented as approximations to cross-validated prediction error.
@@ -47,7 +45,7 @@ Session 3 provides frameworks for comparing multiple candidate models, distingui
 We introduce likelihood ratio tests for nested models and explain why they are inappropriate for non-nested comparisons.
 The session addresses the multiple comparisons problem and its implications for model selection.
 
-Practical guidance focuses on transparent reporting: showing all models considered, reporting AIC differences ($\Delta\text{AIC}$), and interpreting relative model support.
+Practical guidance focuses on transparent reporting: showing all models considered, reporting AIC differences, and interpreting relative model support.
 
 Workshops demonstrate model comparison workflows including fitting candidate models, extracting fit statistics, and presenting results in publication-quality tables.
 
