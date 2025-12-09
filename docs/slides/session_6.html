@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script src="session_6_files/libs/clipboard/clipboard.min.js"></script>
+<script src="session_6_files/libs/quarto-html/tabby.min.js"></script>
+<script src="session_6_files/libs/quarto-html/popper.min.js"></script>
+<script src="session_6_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="session_6_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="session_6_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="session_6_files/libs/quarto-html/quarto-syntax-highlighting-3aa970819e70fbc78806154e5a1fcd28.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-99.9.9">
+
+  <title>Session 6: Special Topics and Best Practices</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="session_6_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="session_6_files/libs/revealjs/dist/reveal.css">
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+  </style>
+  <link rel="stylesheet" href="session_6_files/libs/revealjs/dist/theme/quarto-5c16f98d3e415a13fabd7d88805bbf19.css">
+  <link href="session_6_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="session_6_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="session_6_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="session_6_files/libs/revealjs/plugin/reveal-chalkboard/font-awesome/css/all.css" rel="stylesheet">
+  <link href="session_6_files/libs/revealjs/plugin/reveal-chalkboard/style.css" rel="stylesheet">
+  <link href="session_6_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+</head>
+<body class="quarto-light">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" class="quarto-title-block center">
+  <h1 class="title">Session 6: Special Topics and Best Practices</h1>
+  <p class="subtitle">Model Selection and Model Simplification</p>
+
+<div class="quarto-title-authors">
+</div>
+
+</section>
+<section id="overview" class="slide level2">
+<h2>Overview</h2>
+<p>This final session addresses three important topics.</p>
+<p>First, we cover model selection for mixed models with random effects. Second, we clarify the distinction between prediction, explanation, and causation. Third, we discuss transparent reporting practices for model selection studies.</p>
+<p>These topics integrate concepts from previous sessions and address common challenges in empirical research.</p>
+</section>
+<section id="model-selection-with-mixed-models" class="slide level2">
+<h2>Model Selection with Mixed Models</h2>
+<p>Mixed models include both fixed effects and random effects.</p>
+<p>The general form is:</p>
+<p><span class="math display">\[y_{ij} = \mathbf{x}_{ij}'\boldsymbol{\beta} + \mathbf{z}_{ij}'\mathbf{u}_j + \varepsilon_{ij}\]</span></p>
+<p>where <span class="math inline">\(\boldsymbol{\beta}\)</span> are fixed effects, <span class="math inline">\(\mathbf{u}_j \sim N(0, \mathbf{G})\)</span> are random effects for group <span class="math inline">\(j\)</span>, and <span class="math inline">\(\varepsilon_{ij} \sim N(0, \sigma^2)\)</span>.</p>
+<p>Mixed models are common in longitudinal data, clustered data, and hierarchical designs.</p>
+<p>Model selection must address both fixed and random effects.</p>
+</section>
+<section id="estimating-mixed-models-ml-vs.-reml" class="slide level2">
+<h2>Estimating Mixed Models: ML vs.&nbsp;REML</h2>
+<p>Mixed models can be estimated using maximum likelihood or restricted maximum likelihood.</p>
+<h3 id="ml-maximum-likelihood">ML (maximum likelihood)</h3>
+<p>ML estimates both fixed and random effects simultaneously. The likelihood is:</p>
+<p><span class="math display">\[L(\boldsymbol{\beta}, \mathbf{G}, \sigma^2 | \mathbf{y}) = p(\mathbf{y} | \boldsymbol{\beta}, \mathbf{G}, \sigma^2)\]</span></p>
+<p>ML provides unbiased estimates of fixed effects but biased estimates of variance components.</p>
+<h3 id="reml-restricted-maximum-likelihood">REML (restricted maximum likelihood)</h3>
+<p>REML integrates out the fixed effects and maximizes the likelihood of the residuals. REML provides less biased estimates of variance components. REML is the default in most software because variance estimation is often the primary interest.</p>
+</section>
+<section id="the-reml-problem-for-model-selection" class="slide level2">
+<h2>The REML Problem for Model Selection</h2>
+<h3 id="issue">Issue</h3>
+<p>REML likelihoods are not comparable across models with different fixed effects.</p>
+<p>The REML likelihood depends on the design matrix <span class="math inline">\(\mathbf{X}\)</span> for fixed effects. Changing the fixed effects changes the REML likelihood even if fit is identical.</p>
+<p>This makes AIC and BIC based on REML invalid for comparing fixed effects.</p>
+<h3 id="solution">Solution</h3>
+<p>When comparing models with different fixed effects, use ML estimation. Fit all candidate models with ML, calculate AIC or BIC, and select the best model. If desired, refit the final selected model with REML for inference on variance components.</p>
+<p>When comparing models with different random effects but the same fixed effects, REML is valid.</p>
+</section>
+<section id="selecting-fixed-effects-in-mixed-models" class="slide level2">
+<h2>Selecting Fixed Effects in Mixed Models</h2>
+<h3 id="procedure">Procedure</h3>
+<p>Fit all candidate models with ML (not REML). Calculate AIC or AICc for each model. Rank models by AIC and compute Akaike weights. Identify the 95% confidence set.</p>
+<h3 id="example">Example</h3>
+<p>Compare models with different fixed effects but the same random structure:</p>
+<ul>
+<li>Model 1: <span class="math inline">\(y_{ij} = \beta_0 + \beta_1 x_{1ij} + u_j + \varepsilon_{ij}\)</span></li>
+<li>Model 2: <span class="math inline">\(y_{ij} = \beta_0 + \beta_1 x_{1ij} + \beta_2 x_{2ij} + u_j + \varepsilon_{ij}\)</span></li>
+</ul>
+<p>Fit both with ML, compute AIC, and compare.</p>
+</section>
+<section id="selecting-random-effects-in-mixed-models" class="slide level2">
+<h2>Selecting Random Effects in Mixed Models</h2>
+<h3 id="the-problem">The problem</h3>
+<p>Comparing random effects structures is more complex.</p>
+<p>The null hypothesis that a variance component equals zero is on the boundary of the parameter space. The asymptotic <span class="math inline">\(\chi^2\)</span> distribution for the LRT does not hold.</p>
+<h3 id="approaches">Approaches</h3>
+<p>Use the likelihood ratio test with a boundary-corrected p-value: divide the LRT p-value by 2. Use AIC or BIC, which do not require distributional assumptions. Use model selection criteria designed for mixed models, such as conditional AIC.</p>
+<h3 id="practical-advice">Practical advice</h3>
+<p>Start with a maximal random effects structure justified by the design. Only simplify if there is strong evidence (large <span class="math inline">\(\Delta \text{AIC}\)</span>) that simpler structure is adequate. Do not use stepwise selection for random effects.</p>
+</section>
+<section id="information-criteria-for-mixed-models" class="slide level2">
+<h2>Information Criteria for Mixed Models</h2>
+<h3 id="aic-for-mixed-models">AIC for mixed models</h3>
+<p><span class="math display">\[\text{AIC} = -2\log L_{\text{ML}} + 2k\]</span></p>
+<p>where <span class="math inline">\(k\)</span> is the total number of parameters, including variance components.</p>
+<p>Variance components (e.g., <span class="math inline">\(\sigma_u^2\)</span>, <span class="math inline">\(\sigma^2\)</span>) each count as one parameter.</p>
+<h3 id="marginal-vs.-conditional-aic">Marginal vs.&nbsp;conditional AIC</h3>
+<p>Marginal AIC uses the marginal likelihood integrating over random effects. Conditional AIC uses the likelihood conditional on estimated random effects.</p>
+<p>In practice, standard AIC based on the marginal likelihood (the default in lme4, nlme) is appropriate for model comparison.</p>
+</section>
+<section id="prediction-explanation-and-causation" class="slide level2">
+<h2>Prediction, Explanation, and Causation</h2>
+<p>These are three distinct goals of modeling, each requiring different approaches to model selection.</p>
+<h3 id="prediction">Prediction</h3>
+<p>Goal: Minimize out-of-sample prediction error. Criterion: Cross-validated prediction accuracy, AIC. Interpretation: Coefficients are not necessarily meaningful; focus is on accurate predictions.</p>
+<h3 id="explanation">Explanation</h3>
+<p>Goal: Identify variables associated with the outcome. Criterion: AICc, parsimony, interpretability. Interpretation: Coefficients describe associations but not causal effects.</p>
+<h3 id="causation">Causation</h3>
+<p>Goal: Estimate causal effects of interventions. Criterion: Subject-matter knowledge, causal diagrams, avoiding confounding bias. Interpretation: Coefficients represent causal effects under assumptions.</p>
+</section>
+<section id="model-selection-for-prediction" class="slide level2">
+<h2>Model Selection for Prediction</h2>
+<p>When the goal is prediction, model selection should minimize expected prediction error.</p>
+<h3 id="appropriate-methods">Appropriate methods</h3>
+<p>Use cross-validation to estimate out-of-sample error. Use AIC or AICc to approximate prediction error. Consider regularization (lasso, ridge, elastic net) to reduce overfitting. Use model averaging to incorporate model uncertainty.</p>
+<h3 id="what-matters">What matters</h3>
+<p>Prediction accuracy on new data. Avoiding overfitting.</p>
+<h3 id="what-does-not-matter">What does not matter</h3>
+<p>Interpretability of coefficients. Whether predictors are “causal.” Significance of individual predictors.</p>
+<p>If a predictor improves prediction, include it regardless of theoretical justification.</p>
+</section>
+<section id="model-selection-for-explanation" class="slide level2">
+<h2>Model Selection for Explanation</h2>
+<p>When the goal is explanation, model selection should identify a parsimonious set of variables that describe the outcome.</p>
+<h3 id="appropriate-methods-1">Appropriate methods</h3>
+<p>Use AICc to balance fit and parsimony. Consider BIC if the true model is believed to be among candidates. Report all competitive models with <span class="math inline">\(\Delta \text{AIC} &lt; 2\)</span>. Use model averaging to compute variable importance.</p>
+<h3 id="what-matters-1">What matters</h3>
+<p>Parsimony: a simple, interpretable model. Empirical support: models with substantial Akaike weight.</p>
+<h3 id="what-does-not-matter-1">What does not matter</h3>
+<p>Whether associations are causal.</p>
+<p>Explanation describes associations but does not establish causation. Confounders may bias coefficient estimates even in a well-fitting model.</p>
+</section>
+<section id="model-selection-for-causation" class="slide level2">
+<h2>Model Selection for Causation</h2>
+<p>When the goal is causal inference, model selection must address confounding.</p>
+<h3 id="the-fundamental-problem">The fundamental problem</h3>
+<p>Causal inference requires controlling for confounders but not colliders or mediators. Purely statistical model selection (AIC, stepwise) can select models that induce confounding bias. A model with good predictive fit may have severely biased causal effect estimates.</p>
+<h3 id="appropriate-methods-2">Appropriate methods</h3>
+<p>Use subject-matter knowledge and causal diagrams (DAGs) to specify models. Include all confounders regardless of statistical significance. Do not select variables based on AIC or p-values if the goal is causal inference. Use sensitivity analyses to assess robustness to unmeasured confounding.</p>
+<h3 id="what-matters-2">What matters</h3>
+<p>Correct specification of confounders. Avoiding selection of colliders or mediators.</p>
+<p>Statistical fit (AIC, <span class="math inline">\(R^2\)</span>) is not the primary criterion for causal models.</p>
+</section>
+<section id="example-confounding-and-model-selection" class="slide level2">
+<h2>Example: Confounding and Model Selection</h2>
+<p>Suppose we want to estimate the causal effect of exercise <span class="math inline">\((X)\)</span> on heart disease <span class="math inline">\((Y)\)</span>.</p>
+<p>Age <span class="math inline">\((Z)\)</span> is a confounder: it affects both exercise and heart disease. Body mass <span class="math inline">\((M)\)</span> is a mediator: exercise affects BMI, which affects heart disease.</p>
+<h3 id="incorrect-approach">Incorrect approach</h3>
+<p>Fit models with and without <span class="math inline">\(Z\)</span> and <span class="math inline">\(M\)</span>, select based on AIC. If <span class="math inline">\(M\)</span> is selected, the effect of <span class="math inline">\(X\)</span> is biased because we condition on a mediator.</p>
+<h3 id="correct-approach">Correct approach</h3>
+<p>Include <span class="math inline">\(Z\)</span> (confounder) in the model. Exclude <span class="math inline">\(M\)</span> (mediator) to estimate the total effect of <span class="math inline">\(X\)</span>. Do not use AIC to select between models; use causal reasoning.</p>
+<p>This demonstrates that model selection for causation requires theory, not statistics alone.</p>
+</section>
+<section id="predictive-modeling-vs.-causal-modeling" class="slide level2">
+<h2>Predictive Modeling vs.&nbsp;Causal Modeling</h2>
+<h3 id="predictive-modeling">Predictive modeling</h3>
+<p>Goal: Forecast outcomes accurately. Variables: Include anything that improves prediction. Methods: AIC, cross-validation, regularization. Example: Predict house prices for valuation.</p>
+<h3 id="causal-modeling">Causal modeling</h3>
+<p>Goal: Estimate effects of interventions. Variables: Include confounders, exclude colliders and mediators. Methods: Causal diagrams, sensitivity analysis. Example: Estimate effect of exercise program on health outcomes.</p>
+<h3 id="key-distinction">Key distinction</h3>
+<p>A model that predicts well may be a terrible causal model. A model that estimates causal effects well may predict poorly.</p>
+<p>Researchers must be clear about the goal and choose methods accordingly.</p>
+</section>
+<section id="transparent-reporting-of-model-selection" class="slide level2">
+<h2>Transparent Reporting of Model Selection</h2>
+<p>Transparent reporting is essential for reproducibility and to avoid misleading readers.</p>
+<h3 id="what-to-report">What to report</h3>
+<p>The candidate set of models considered. The model selection criterion used (e.g., AICc, cross-validation). All models with <span class="math inline">\(\Delta \text{AIC} &lt; 2\)</span> or in the 95% confidence set. Whether the candidate set was pre-specified or data-driven.</p>
+<h3 id="what-not-to-do">What not to do</h3>
+<p>Report only the “best” model without showing competitors. Claim that the selected model is the “true” model. Report p-values from a model selected based on statistical criteria without acknowledging selection bias. Use stepwise selection and present the final model as if it were pre-specified.</p>
+</section>
+<section id="example-poor-vs.-good-reporting" class="slide level2">
+<h2>Example: Poor vs.&nbsp;Good Reporting</h2>
+<h3 id="poor-reporting">Poor reporting</h3>
+<p>“We used stepwise regression to select the best model. The final model included predictors <span class="math inline">\(A\)</span>, <span class="math inline">\(B\)</span>, and <span class="math inline">\(C\)</span> (all <span class="math inline">\(p &lt; 0.05\)</span>).”</p>
+<p>This does not disclose: - How many models were considered. - Which selection criterion was used. - Whether other models had similar support. - That p-values are invalid after selection.</p>
+<h3 id="good-reporting">Good reporting</h3>
+<p>“We compared 12 candidate models using AICc. The best model included <span class="math inline">\(A\)</span>, <span class="math inline">\(B\)</span>, and <span class="math inline">\(C\)</span> (<span class="math inline">\(\Delta \text{AICc} = 0\)</span>, weight = 0.48). Two additional models had <span class="math inline">\(\Delta \text{AICc} &lt; 2\)</span> (see Table 1). We report model-averaged coefficients to account for model uncertainty. Standard errors reflect both parameter and model uncertainty.”</p>
+<p>This discloses the selection process and acknowledges uncertainty.</p>
+</section>
+<section id="reporting-model-comparison-tables" class="slide level2">
+<h2>Reporting Model Comparison Tables</h2>
+<p>A model comparison table should include:</p>
+<ul>
+<li>Model ID or description</li>
+<li>Number of parameters (<span class="math inline">\(k\)</span>)</li>
+<li>Log-likelihood or deviance</li>
+<li>AIC or AICc</li>
+<li><span class="math inline">\(\Delta \text{AIC}\)</span></li>
+<li>Akaike weight</li>
+<li>Cumulative weight (optional)</li>
+</ul>
+<h3 id="example-table">Example table</h3>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Model</th>
+<th>k</th>
+<th>Log-Lik</th>
+<th>AICc</th>
+<th>Δ AICc</th>
+<th>Weight</th>
+<th>Cumulative</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>M3</td>
+<td>5</td>
+<td>-120.3</td>
+<td>250.9</td>
+<td>0.0</td>
+<td>0.52</td>
+<td>0.52</td>
+</tr>
+<tr class="even">
+<td>M2</td>
+<td>4</td>
+<td>-121.5</td>
+<td>251.2</td>
+<td>0.3</td>
+<td>0.45</td>
+<td>0.97</td>
+</tr>
+<tr class="odd">
+<td>M4</td>
+<td>6</td>
+<td>-120.1</td>
+<td>252.5</td>
+<td>1.6</td>
+<td>0.23</td>
+<td>1.00</td>
+</tr>
+<tr class="even">
+<td>M1</td>
+<td>3</td>
+<td>-125.8</td>
+<td>257.7</td>
+<td>6.8</td>
+<td>0.02</td>
+<td>1.00</td>
+</tr>
+</tbody>
+</table>
+<p>Models M3, M2, and M4 are in the 95% confidence set.</p>
+</section>
+<section id="pre-registration-and-model-selection" class="slide level2">
+<h2>Pre-Registration and Model Selection</h2>
+<h3 id="the-problem-1">The problem</h3>
+<p>Data-driven model selection inflates Type I error and produces overly optimistic results. Post-hoc rationalization of selected models is common.</p>
+<h3 id="solutions">Solutions</h3>
+<p>Pre-register the candidate set and selection strategy before data collection. Specify which models will be compared and which criterion will be used. If data-driven selection is unavoidable, acknowledge it and use validation data.</p>
+<p>Pre-registration does not eliminate model uncertainty, but it reduces selective reporting and p-hacking.</p>
+</section>
+<section id="cross-validation-for-validation" class="slide level2">
+<h2>Cross-Validation for Validation</h2>
+<p>When model selection is data-driven, validate the selected model on independent data.</p>
+<h3 id="nested-cross-validation">Nested cross-validation</h3>
+<p>Outer loop: Split data into train and test sets. Inner loop: Perform model selection on training data using cross-validation. Fit selected model on full training data. Evaluate on test data (which was not used for selection).</p>
+<p>This provides an honest estimate of how the entire selection procedure performs on new data.</p>
+<p>Simple cross-validation (without nesting) is invalid when used for both selection and evaluation.</p>
+</section>
+<section id="reporting-uncertainty-after-selection" class="slide level2">
+<h2>Reporting Uncertainty After Selection</h2>
+<h3 id="the-problem-2">The problem</h3>
+<p>Standard errors and confidence intervals from a selected model are too narrow. P-values are too small because they do not account for the search process.</p>
+<h3 id="solutions-1">Solutions</h3>
+<p>Use data splitting: select on one subset, perform inference on another. Use bootstrap or permutation methods to estimate uncertainty. Use post-selection inference methods such as selective inference. Report model-averaged estimates with unconditional standard errors. Acknowledge that the model was data-selected and interpret cautiously.</p>
+<h3 id="practical-advice-1">Practical advice</h3>
+<p>If you must select a model, be transparent about it. Do not over-interpret p-values or confidence intervals from selected models.</p>
+</section>
+<section id="the-replication-crisis-and-model-selection" class="slide level2">
+<h2>The Replication Crisis and Model Selection</h2>
+<p>Many published findings fail to replicate.</p>
+<p>One major cause is data-driven model selection combined with selective reporting.</p>
+<h3 id="the-mechanism">The mechanism</h3>
+<p>Researchers fit many models. They report the model with the best fit or most “interesting” results. P-values and effect sizes are inflated due to selection. Subsequent studies with independent data do not replicate the findings.</p>
+<h3 id="the-solution">The solution</h3>
+<p>Transparent reporting of all models considered. Pre-registration of model selection strategy. Validation on independent data. Acknowledging model uncertainty through model averaging or confidence sets.</p>
+<p>These practices improve the reliability and reproducibility of empirical research.</p>
+</section>
+<section id="summary-integrating-model-selection-into-research" class="slide level2">
+<h2>Summary: Integrating Model Selection into Research</h2>
+<h3 id="for-prediction">For prediction</h3>
+<p>Use cross-validation and AIC to minimize prediction error. Consider regularization for high-dimensional problems. Use model averaging to improve prediction and quantify uncertainty.</p>
+<h3 id="for-explanation">For explanation</h3>
+<p>Use AICc to identify parsimonious models with empirical support. Report all competitive models, not just the “winner.” Use model-averaged coefficients and variable importance.</p>
+<h3 id="for-causation">For causation</h3>
+<p>Use subject-matter knowledge and causal diagrams to specify models. Do not rely on AIC or statistical selection. Include confounders; avoid conditioning on mediators or colliders.</p>
+<h3 id="for-transparency">For transparency</h3>
+<p>Report the candidate set, selection criterion, and all competitive models. Acknowledge when selection is data-driven. Validate selected models on independent data when possible.</p>
+</section>
+<section id="looking-ahead" class="slide level2">
+<h2>Looking Ahead</h2>
+<h3 id="this-workshop">This workshop</h3>
+<p>We covered six sessions on model selection and model simplification.</p>
+<p>Session 1 introduced the bias-variance tradeoff and the overfitting problem. Session 2 covered cross-validation and information criteria for estimating out-of-sample error. Session 3 addressed frameworks for comparing models, including likelihood ratio tests and <span class="math inline">\(\Delta \text{AIC}\)</span>. Session 4 examined variable selection methods, including stepwise, all-subsets, and regularization. Session 5 introduced model averaging as an alternative to single-model selection. Session 6 addressed mixed models, prediction versus causation, and transparent reporting.</p>
+<h3 id="key-principles">Key principles</h3>
+<p>Out-of-sample prediction error is the target quantity for model comparison. Training error always decreases with complexity; it is a poor guide for model selection. Cross-validation and information criteria provide better estimates of out-of-sample performance. Model averaging acknowledges uncertainty when multiple models have similar support. The goal of modeling (prediction, explanation, causation) determines the appropriate selection method. Transparent reporting of model selection is essential for reproducibility.</p>
+</section>
+<section id="final-recommendations" class="slide level2">
+<h2>Final Recommendations</h2>
+<p>Use theory and prior knowledge to define a small candidate set. Do not fit all possible models or use stepwise selection for final inference. Report all models with <span class="math inline">\(\Delta \text{AIC} &lt; 2\)</span>, not just the “best” one. Use model averaging when multiple models are competitive. For causal inference, rely on subject-matter knowledge rather than statistical selection. Validate selected models on independent data when possible. Be transparent about the model selection process in publications. Pre-register model selection strategies to reduce selective reporting.</p>
+<p>Following these principles will improve the rigor, transparency, and reproducibility of empirical research using statistical models.</p>
+
+</section>
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
+<div class="footer footer-default">
+<p><a href="https://mark-andrews.github.io/msms/">mark-andrews.github.io/msms/</a></p>
+</div>
+</div></div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="session_6_files/libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="session_6_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="session_6_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="session_6_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="session_6_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="session_6_files/libs/revealjs/plugin/reveal-chalkboard/plugin.js"></script>
+  <script src="session_6_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="session_6_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="session_6_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="session_6_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="session_6_files/libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': true,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleChalkboard(event)\"><kbd>b</kbd> Toggle Chalkboard</a></li>\n<li class=\"slide-tool-item\" data-item=\"6\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleNotesCanvas(event)\"><kbd>c</kbd> Toggle Notes Canvas</a></li>\n<li class=\"slide-tool-item\" data-item=\"7\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.downloadDrawings(event)\"><kbd>d</kbd> Download Drawings</a></li>\n<li class=\"slide-tool-item\" data-item=\"8\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'chalkboard': {"buttons":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: 'c/t',
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'none',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1050,
+
+        height: 700,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0.1,
+
+        math: {
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, RevealChalkboard, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    <script id="quarto-html-after-body" type="application/javascript">
+      window.document.addEventListener("DOMContentLoaded", function (event) {
+        const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+        tabsets.forEach(function(tabset) {
+          const tabby = new Tabby('#' + tabset.id);
+        });
+        const isCodeAnnotation = (el) => {
+          for (const clz of el.classList) {
+            if (clz.startsWith('code-annotation-')) {                     
+              return true;
+            }
+          }
+          return false;
+        }
+        const onCopySuccess = function(e) {
+          // button target
+          const button = e.trigger;
+          // don't keep focus
+          button.blur();
+          // flash "checked"
+          button.classList.add('code-copy-button-checked');
+          var currentTitle = button.getAttribute("title");
+          button.setAttribute("title", "Copied!");
+          let tooltip;
+          if (window.bootstrap) {
+            button.setAttribute("data-bs-toggle", "tooltip");
+            button.setAttribute("data-bs-placement", "left");
+            button.setAttribute("data-bs-title", "Copied!");
+            tooltip = new bootstrap.Tooltip(button, 
+              { trigger: "manual", 
+                customClass: "code-copy-button-tooltip",
+                offset: [0, -8]});
+            tooltip.show();    
+          }
+          setTimeout(function() {
+            if (tooltip) {
+              tooltip.hide();
+              button.removeAttribute("data-bs-title");
+              button.removeAttribute("data-bs-toggle");
+              button.removeAttribute("data-bs-placement");
+            }
+            button.setAttribute("title", currentTitle);
+            button.classList.remove('code-copy-button-checked');
+          }, 1000);
+          // clear code selection
+          e.clearSelection();
+        }
+        const getTextToCopy = function(trigger) {
+          const outerScaffold = trigger.parentElement.cloneNode(true);
+          const codeEl = outerScaffold.querySelector('code');
+          for (const childEl of codeEl.children) {
+            if (isCodeAnnotation(childEl)) {
+              childEl.remove();
+            }
+          }
+          return codeEl.innerText;
+        }
+        const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+          text: getTextToCopy
+        });
+        clipboard.on('success', onCopySuccess);
+        if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+          const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+            text: getTextToCopy,
+            container: window.document.getElementById('quarto-embedded-source-code-modal')
+          });
+          clipboardModal.on('success', onCopySuccess);
+        }
+          var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+          var mailtoRegex = new RegExp(/^mailto:/);
+            var filterRegex = new RegExp('/' + window.location.host + '/');
+          var isInternal = (href) => {
+              return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+          }
+          // Inspect non-navigation links and adorn them if external
+         var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+          for (var i=0; i<links.length; i++) {
+            const link = links[i];
+            if (!isInternal(link.href)) {
+              // undo the damage that might have been done by quarto-nav.js in the case of
+              // links that we want to consider external
+              if (link.dataset.originalHref !== undefined) {
+                link.href = link.dataset.originalHref;
+              }
+            }
+          }
+        function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+          const config = {
+            allowHTML: true,
+            maxWidth: 500,
+            delay: 100,
+            arrow: false,
+            appendTo: function(el) {
+                return el.closest('section.slide') || el.parentElement;
+            },
+            interactive: true,
+            interactiveBorder: 10,
+            theme: 'light-border',
+            placement: 'bottom-start',
+          };
+          if (contentFn) {
+            config.content = contentFn;
+          }
+          if (onTriggerFn) {
+            config.onTrigger = onTriggerFn;
+          }
+          if (onUntriggerFn) {
+            config.onUntrigger = onUntriggerFn;
+          }
+            config['offset'] = [0,0];
+            config['maxWidth'] = 700;
+          window.tippy(el, config); 
+        }
+        const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+        for (var i=0; i<noterefs.length; i++) {
+          const ref = noterefs[i];
+          tippyHover(ref, function() {
+            // use id or data attribute instead here
+            let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+            try { href = new URL(href).hash; } catch {}
+            const id = href.replace(/^#\/?/, "");
+            const note = window.document.getElementById(id);
+            if (note) {
+              return note.innerHTML;
+            } else {
+              return "";
+            }
+          });
+        }
+        const findCites = (el) => {
+          const parentEl = el.parentElement;
+          if (parentEl) {
+            const cites = parentEl.dataset.cites;
+            if (cites) {
+              return {
+                el,
+                cites: cites.split(' ')
+              };
+            } else {
+              return findCites(el.parentElement)
+            }
+          } else {
+            return undefined;
+          }
+        };
+        var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+        for (var i=0; i<bibliorefs.length; i++) {
+          const ref = bibliorefs[i];
+          const citeInfo = findCites(ref);
+          if (citeInfo) {
+            tippyHover(citeInfo.el, function() {
+              var popup = window.document.createElement('div');
+              citeInfo.cites.forEach(function(cite) {
+                var citeDiv = window.document.createElement('div');
+                citeDiv.classList.add('hanging-indent');
+                citeDiv.classList.add('csl-entry');
+                var biblioDiv = window.document.getElementById('ref-' + cite);
+                if (biblioDiv) {
+                  citeDiv.innerHTML = biblioDiv.innerHTML;
+                }
+                popup.appendChild(citeDiv);
+              });
+              return popup.innerHTML;
+            });
+          }
+        }
+      });
+      </script>
+    
+
+</body></html>

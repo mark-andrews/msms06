@@ -1,0 +1,300 @@
+---
+title: "Session 2: Out-of-Sample Prediction"
+subtitle: "Model Selection and Model Simplification"
+---
+
+## The Core Problem
+
+From Session 1, we learned that training error is optimistically biased and always decreases with complexity.
+
+We need an estimate of how the model performs on new data.
+The gold standard is an independent test set drawn from the same population.
+However, we often cannot afford to set aside a large test set.
+
+This session covers methods to estimate out-of-sample prediction error efficiently.
+
+We will use two complementary approaches.
+Cross-validation resamples the training data to simulate test sets.
+Information criteria analytically adjust training error for complexity.
+
+---
+
+## Why In-Sample Fit is Misleading
+
+A model fit to data $\mathcal{D} = \{(x_i, y_i)\}_{i=1}^n$ minimizes training error.
+
+For the same data used to fit the model, we have:
+
+$$\text{Training Error} = \frac{1}{n}\sum_{i=1}^{n}(y_i - \hat{f}(x_i))^2$$
+
+This is optimistically biased for three reasons.
+The parameters $\hat{\beta}$ were chosen specifically to minimize error on $\mathcal{D}$.
+The model has "seen" these observations during fitting.
+The error is artificially low compared to performance on new data.
+
+The consequence is that R², adjusted R², residual standard error, and training deviance all underestimate true prediction error.
+
+This bias increases with model complexity because more parameters means more overfitting.
+
+---
+
+## Out-of-Sample Prediction Error
+
+The true quantity of interest is the expected prediction error:
+
+$$\text{EPE} = \mathbb{E}_{(x_0, y_0)}[(y_0 - \hat{f}(x_0))^2]$$
+
+where $(x_0, y_0)$ is a new observation not used for fitting.
+
+The expectation is taken over two sources of randomness: the new observation $(x_0, y_0)$ from the population, and the training sample $\mathcal{D}$ used to estimate $\hat{f}$.
+
+The problem is that we cannot directly compute EPE because we do not have a population of new observations.
+
+We need an estimate of EPE using only the training data $\mathcal{D}$.
+
+---
+
+## Cross-Validation: The Idea
+
+The strategy is to simulate having multiple train/test splits by subdividing the available data.
+
+The basic procedure has three steps.
+First, we split the data into $K$ roughly equal folds.
+Second, for each fold $k = 1, \ldots, K$, we train the model on all folds except $k$ and evaluate on fold $k$ (which was not used for fitting).
+Third, we average the prediction error across all $K$ folds.
+
+The key insight is that each observation serves as test data exactly once, but is never used to fit the model that predicts it.
+
+The result is an approximately unbiased estimate of out-of-sample prediction error.
+
+---
+
+## K-Fold Cross-Validation
+
+We partition the data $\mathcal{D}$ into $K$ folds: $\mathcal{D} = \mathcal{F}_1 \cup \mathcal{F}_2 \cup \cdots \cup \mathcal{F}_K$.
+
+For each fold $k$, we train on $\mathcal{D} \setminus \mathcal{F}_k$ (all data except fold $k$), test on $\mathcal{F}_k$, and compute the error $\text{Err}_k = \frac{1}{|\mathcal{F}_k|}\sum_{i \in \mathcal{F}_k}(y_i - \hat{f}_{-k}(x_i))^2$, where $\hat{f}_{-k}$ is fit excluding fold $k$.
+
+The cross-validation estimate is:
+
+$$\text{CV}(K) = \frac{1}{K}\sum_{k=1}^{K}\text{Err}_k$$
+
+Common choices are $K = 5$ or $K = 10$.
+
+---
+
+## Leave-One-Out Cross-Validation
+
+This is a special case where $K = n$, so each fold contains a single observation.
+
+For each observation $i$, we fit the model on all data except observation $i$, predict for observation $i$ using $\hat{y}_{-i} = \hat{f}_{-i}(x_i)$, and compute the squared error $(y_i - \hat{y}_{-i})^2$.
+
+The LOOCV estimate is:
+
+$$\text{CV}_{(n)} = \frac{1}{n}\sum_{i=1}^{n}(y_i - \hat{y}_{-i})^2$$
+
+*Advantages*: LOOCV provides a nearly unbiased estimate of EPE.
+It is deterministic, with no randomness from fold assignment.
+
+*Disadvantages*: It is computationally expensive because we must fit $n$ models.
+It has high variance as an estimate because the folds are highly correlated.
+
+---
+
+## Bias-Variance Tradeoff in CV
+
+The choice of $K$ involves a tradeoff between bias and variance.
+
+### Large $K$ (e.g., $K = n$)
+
+The training sets are nearly identical, with size $n-1$ versus $n$.
+This gives low bias: we accurately estimate the error for a model trained on $n$ observations.
+However, it gives high variance: the folds are highly overlapping, so the errors are highly correlated.
+It is also computationally expensive.
+
+### Small $K$ (e.g., $K = 5$)
+
+The training sets are substantially smaller than $n$.
+This gives moderate bias: we overestimate the error because models are trained on less data.
+However, it gives low variance: the folds are more independent.
+It is also computationally cheaper.
+
+The recommendation is that $K = 5$ or $K = 10$ provides a good bias-variance tradeoff in practice.
+
+---
+
+## Information Criteria: Motivation
+
+Cross-validation has a computational cost: we must refit the model $K$ times.
+
+An alternative is to analytically estimate out-of-sample error from a single model fit.
+
+Information criteria have the general form:
+
+$$\text{IC} = -2\log L(\hat{\theta}) + \text{penalty}(k, n)$$
+
+where $L(\hat{\theta})$ is the maximized likelihood, $k$ is the number of parameters, and the penalty increases with model complexity.
+
+The intuition is to start with the training deviance $-2\log L$ and add a penalty for complexity to approximate the test deviance.
+
+---
+
+## Akaike Information Criterion (AIC)
+
+$$\text{AIC} = -2\log L(\hat{\theta}) + 2k$$
+
+The derivation intuition is that the expected out-of-sample deviance can be approximated by the training deviance plus a bias correction.
+
+Under regularity conditions:
+
+$$\mathbb{E}[-2\log L(\hat{\theta}_{\text{new}})] \approx -2\log L(\hat{\theta}) + 2k$$
+
+where $\hat{\theta}_{\text{new}}$ is the likelihood evaluated on new data from the same population.
+
+The penalty is $2k$, which is linear in the number of parameters.
+
+The interpretation is that AIC provides an asymptotic estimate of expected prediction error.
+
+Lower AIC is better because it indicates less predicted out-of-sample deviance.
+
+
+<!-- ## AIC Derivation Sketch
+
+Consider a parametric model with $k$ parameters and true parameter $\theta_0$.
+
+The goal is to estimate the expected Kullback-Leibler divergence between the true distribution and the fitted model.
+
+For a new observation from the true distribution:
+
+$$\mathbb{E}_{y_0}[-2\log L(\hat{\theta}; y_0)] = -2\mathbb{E}[\log L(\hat{\theta}; y_0)]$$
+
+We expand around $\theta_0$ using a Taylor approximation:
+
+$$\mathbb{E}[-2\log L(\hat{\theta}; y_0)] \approx -2\log L(\hat{\theta}) + 2\text{tr}(\mathbf{H}^{-1}\mathbf{J})$$
+
+Under regularity conditions where the Fisher information matrix $\mathbf{J}$ equals the Hessian $\mathbf{H}$, we have:
+
+$$\text{tr}(\mathbf{H}^{-1}\mathbf{J}) = \text{tr}(\mathbf{I}) = k$$
+
+Therefore, AIC $= -2\log L(\hat{\theta}) + 2k$.
+
+--- -->
+
+## AICc: Small Sample Correction
+
+Standard AIC assumes $n \to \infty$.
+
+For finite samples, especially when $n/k < 40$, AIC underpenalizes complexity.
+
+The corrected AIC (AICc) is:
+
+$$\text{AICc} = -2\log L(\hat{\theta}) + 2k + \frac{2k(k+1)}{n - k - 1}.$$
+
+The additional term $\frac{2k(k+1)}{n - k - 1}$ increases the penalty when $k$ is large relative to $n$.
+
+### Properties
+
+AICc converges to AIC as $n \to \infty$.
+AICc is more conservative than AIC for small $n$.
+AICc is the recommended default unless $n$ is very large.
+
+The rule of thumb is to use AICc when $n/k < 40\ $.
+
+---
+
+## Bayesian Information Criterion (BIC)
+
+$$\text{BIC} = -2\log L(\hat{\theta}) + k \log(n)$$
+
+BIC has a different philosophical foundation: it is derived from Bayesian model comparison as an approximation to the log Bayes factor.
+
+The penalty is $k\log(n)$, which increases with sample size $n$.
+
+### Comparison to AIC
+
+For $n > 8$, the BIC penalty is greater than the AIC penalty because $\log(n) > 2\ $.
+BIC penalizes complexity more heavily than AIC.
+BIC favors simpler models.
+
+### Interpretation difference
+
+AIC is optimal for prediction.
+BIC is consistent for "true model" selection if the true model is in the candidate set.
+
+---
+
+## AIC vs. BIC: When to Use Which?
+
+*Use AIC (or AICc) when*: 
+The primary goal is prediction or forecasting.
+We want to minimize out-of-sample prediction error.
+We are skeptical that the "true model" is among the candidates.
+We are working with complex phenomena where a parsimonious model is unlikely to be exactly correct.
+
+*Use BIC when*: The primary goal is identifying the "true" data-generating process.
+We are willing to assume the true model is in the candidate set (a strong assumption).
+We want a more parsimonious model.
+We have a large sample size, so the BIC penalty is much larger than the AIC penalty.
+
+### In practice
+
+Often both AIC and BIC select the same model.
+When they disagree, BIC favors the simpler model.
+Neither is universally "better"; the choice depends on the goal.
+
+---
+
+## Information Criteria: Important Caveats
+
+ICs have sampling variability.
+A difference of 1-2 units is typically not meaningful.
+Multiple models may have similar evidence.
+
+*Rule of thumb (Burnham & Anderson)*: 
+
+- When $\Delta$AIC $< 2$, there is substantial evidence for both models.
+- When $\Delta$AIC is between 4 and 7, there is considerably less support for the higher-AIC model.
+- When $\Delta$AIC $> 10$, there is essentially no support for the higher-AIC model.
+
+Models must use the same response variable.
+Models must use the same observations (no missing data differences).
+We cannot compare across different transformations of $y$.
+Absolute values are meaningless; only differences matter.
+
+---
+
+## Relationship: Cross-Validation and AIC
+
+A theoretical result shows that for linear models, LOOCV and AIC are asymptotically equivalent.
+
+Both estimate the same quantity: expected out-of-sample prediction error.
+
+AIC and k-fold CV often rank models similarly.
+AIC is computationally cheaper because it requires a single model fit versus $K$ fits.
+CV is more general because it works for any loss function and any model class.
+
+CV is finite-sample exact, while AIC is an asymptotic approximation.
+CV can use any error metric, such as median absolute error.
+AIC is restricted to likelihood-based models.
+
+The practical strategy is to use AIC for initial screening and confirm with CV if needed.
+
+---
+
+## Looking Ahead
+
+### This session
+
+We covered methods to estimate out-of-sample prediction error.
+
+### Next session
+
+We will cover frameworks for comparing multiple models.
+This includes likelihood ratio tests for nested models, using $\Delta$AIC for non-nested models, the multiple comparison problem, and transparent reporting.
+
+### Key concepts established
+
+Out-of-sample error is the target quantity.
+Cross-validation provides a nearly unbiased estimate.
+Information criteria provide computationally cheap approximations.
+Both methods penalize complexity to avoid overfitting.

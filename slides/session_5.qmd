@@ -1,0 +1,378 @@
+---
+title: "Session 5: Model Averaging"
+subtitle: "Model Selection and Model Simplification"
+---
+
+## The Model Uncertainty Problem
+
+We have fit multiple models and identified several with similar empirical support.
+
+For example, models with $\Delta \text{AIC} < 2$ are competitive.
+
+The traditional approach is to select one "best" model and ignore the others.
+This discards information about model uncertainty.
+It treats selection as if it were certain when it is not.
+
+### The consequence
+
+Predictions from the selected model ignore uncertainty about which model is correct.
+Standard errors and confidence intervals are too narrow because they condition on the selected model.
+Post-selection inference is invalid.
+
+### An alternative
+
+Model averaging acknowledges uncertainty by combining predictions across multiple models.
+We weight each model by its empirical support rather than selecting a single winner.
+
+---
+
+## What is Model Averaging?
+
+Rather than selecting model $k^*$ with minimum AIC, we form a weighted average across all $K$ candidate models.
+
+The model-averaged prediction for a new observation $x_0$ is:
+
+$$\hat{y}_{\text{avg}}(x_0) = \sum_{k=1}^{K} w_k \cdot \hat{y}_k(x_0)$$
+
+where $w_k$ is the weight assigned to model $k$ and $\hat{y}_k(x_0)$ is the prediction from model $k$.
+
+The weights sum to one: $\sum_{k=1}^{K} w_k = 1$.
+
+The weights reflect the relative empirical support for each model.
+Models with better fit receive higher weight.
+Models with poor fit receive near-zero weight.
+
+---
+
+## Akaike Weights
+
+The standard weighting scheme uses Akaike weights derived from AIC differences.
+
+For model $k$ with AIC value $\text{AIC}_k$, define:
+
+$$\Delta_k = \text{AIC}_k - \min(\text{AIC})$$
+
+The Akaike weight is:
+
+$$w_k = \frac{\exp(-\Delta_k / 2)}{\sum_{j=1}^{K} \exp(-\Delta_j / 2)}$$
+
+### Interpretation
+
+The weight $w_k$ can be interpreted as the probability that model $k$ is the best model for prediction among the candidate set, given the data and assuming one of the models is correct.
+
+Models with $\Delta_k = 0$ (the best model) receive the highest weight.
+Models with large $\Delta_k$ receive weight approaching zero.
+
+---
+
+## Properties of Akaike Weights
+
+### Weights sum to one
+
+By construction, $\sum_{k=1}^{K} w_k = 1$.
+
+This ensures the weighted average is a convex combination of model predictions.
+
+### Exponential decay
+
+Weight decreases exponentially with $\Delta_k$.
+
+When $\Delta_k = 2$, the model receives weight approximately $1/e \approx 0.37$ times the weight of the best model.
+When $\Delta_k = 10$, the model receives weight approximately $0.007$ times the weight of the best model.
+
+This means models with $\Delta_k > 10$ contribute negligibly to the average.
+
+### Relative support
+
+The weight ratio $w_k / w_j = \exp[(\Delta_j - \Delta_k)/2]$ measures the relative support for model $k$ versus model $j$.
+
+If $\Delta_k = 0$ and $\Delta_j = 4$, then $w_k / w_j = \exp(2) \approx 7.4$, meaning model $k$ has about 7 times the support of model $j$.
+
+---
+
+## Example: Three Competitive Models
+
+Suppose we have three models with AIC values:
+
+$$\text{AIC}_1 = 450.2, \quad \text{AIC}_2 = 451.8, \quad \text{AIC}_3 = 455.0$$
+
+### Compute differences
+
+$$\Delta_1 = 0, \quad \Delta_2 = 1.6, \quad \Delta_3 = 4.8$$
+
+### Compute weights
+
+$$w_1 = \frac{\exp(0)}{\exp(0) + \exp(-0.8) + \exp(-2.4)} = \frac{1}{1 + 0.449 + 0.091} = 0.650$$
+
+$$w_2 = \frac{\exp(-0.8)}{1.540} = 0.292$$
+
+$$w_3 = \frac{\exp(-2.4)}{1.540} = 0.059$$
+
+The best model receives 65% weight, the second model 29%, and the third only 6%.
+
+---
+
+## When to Use Model Averaging
+
+### When multiple models have similar support
+
+If several models have $\Delta \text{AIC} < 2$, they are empirically indistinguishable.
+Selecting one arbitrarily discards information.
+Model averaging incorporates all competitive models.
+
+### When model uncertainty is important
+
+If the goal is prediction with honest uncertainty quantification, model averaging accounts for both parameter uncertainty (within each model) and model uncertainty (across models).
+
+Standard errors from a single selected model underestimate true uncertainty.
+
+### When model interpretation is secondary
+
+Model averaging produces better predictions but complicates interpretation.
+The averaged predictions do not correspond to any single model.
+If the goal is to identify a single parsimonious model for interpretation, selection may be preferred.
+
+---
+
+## When NOT to Use Model Averaging
+
+### When one model dominates
+
+If the best model has $\Delta_k > 10$ for all other models, that model receives nearly all weight.
+Model averaging reduces to single-model selection.
+
+### When interpretability is paramount
+
+Averaged coefficients or predictions do not correspond to a coherent mechanistic model.
+For scientific inference about specific mechanisms, a single interpretable model may be preferred.
+
+### When computational cost is prohibitive
+
+Model averaging requires fitting and storing all $K$ candidate models.
+For very large $K$ or computationally intensive models, this may be infeasible.
+
+---
+
+## Model-Averaged Predictions
+
+For a new observation $x_0$, the model-averaged prediction is:
+
+$$\hat{y}_{\text{avg}}(x_0) = \sum_{k=1}^{K} w_k \cdot \hat{y}_k(x_0)$$
+
+where $\hat{y}_k(x_0)$ is the prediction from model $k$ fitted to the full data.
+
+### Variance
+
+The variance of the model-averaged prediction accounts for both parameter uncertainty and model uncertainty:
+
+$$\text{Var}(\hat{y}_{\text{avg}}(x_0)) = \sum_{k=1}^{K} w_k \left[ \text{Var}(\hat{y}_k(x_0)) + (\hat{y}_k(x_0) - \hat{y}_{\text{avg}}(x_0))^2 \right]$$
+
+The first term is the weighted average of within-model variances.
+The second term captures the variability in predictions across models.
+
+This variance is typically larger than the variance from any single selected model.
+
+---
+
+## Model-Averaged Coefficients
+
+We can also compute model-averaged coefficient estimates.
+
+For predictor $x_j$, the model-averaged coefficient is:
+
+$$\bar{\beta}_j = \sum_{k=1}^{K} w_k \cdot \beta_{jk}$$
+
+where $\beta_{jk}$ is the coefficient for $x_j$ in model $k$.
+
+### Handling predictors not in all models
+
+If predictor $x_j$ does not appear in model $k$, we set $\beta_{jk} = 0$.
+
+This means models that exclude $x_j$ contribute zero to its averaged coefficient.
+
+The averaged coefficient reflects both the magnitude of $\beta_j$ in models where it appears and the support for those models.
+
+---
+
+## Confidence Sets
+
+Rather than selecting a single "best" model, we can identify a confidence set of models.
+
+A 95% confidence set contains models whose cumulative Akaike weight sums to 0.95.
+
+### Procedure
+
+Rank models by AIC (or equivalently, by descending weight $w_k$).
+Include models sequentially until their cumulative weight reaches 0.95:
+
+$$\sum_{k \in \mathcal{S}} w_k \geq 0.95$$
+
+The confidence set $\mathcal{S}$ contains the smallest collection of models accounting for 95% of the total weight.
+
+### Interpretation
+
+These are the models with substantial empirical support.
+Any model outside this set has negligible support given the data.
+
+---
+
+## Example: Confidence Set
+
+Suppose we have five models with weights:
+
+$$w_1 = 0.50, \quad w_2 = 0.30, \quad w_3 = 0.12, \quad w_4 = 0.05, \quad w_5 = 0.03$$
+
+### Cumulative weights
+
+- Model 1: 0.50
+- Models 1-2: 0.80
+- Models 1-3: 0.92
+- Models 1-4: 0.97
+
+The 95% confidence set contains models 1, 2, 3, and 4.
+Model 5 is excluded because its inclusion is not needed to reach 95% cumulative weight.
+
+---
+
+## Model Averaging vs. Model Selection
+
+### Model selection
+
+Choose model $k^*$ with minimum AIC.
+Use only $\hat{y}_{k^*}(x_0)$ for predictions.
+Inference conditions on the selected model.
+Simpler to interpret: a single model with specific predictors.
+
+### Model averaging
+
+Compute weighted average $\hat{y}_{\text{avg}}(x_0) = \sum_k w_k \hat{y}_k(x_0)$.
+Predictions incorporate information from all competitive models.
+Inference accounts for model uncertainty.
+Better prediction performance when multiple models have similar support.
+
+### Empirical evidence
+
+Simulation studies show model averaging often improves prediction accuracy compared to single-model selection, especially when model uncertainty is high.
+
+---
+
+## Practical Implementation
+
+Model averaging is implemented in the MuMIn package in R.
+
+### Workflow
+
+Fit the global model containing all candidate predictors.
+Use `dredge()` to fit all subsets.
+Calculate AIC and Akaike weights for each model.
+Use `model.avg()` to compute averaged predictions and coefficients.
+
+Alternatively, manually specify a candidate set of theoretically motivated models and compute weights.
+
+### Reporting
+
+Report all models in the confidence set (cumulative weight $\geq 0.95$).
+Show each model's predictors, AIC, $\Delta \text{AIC}$, and weight.
+Report model-averaged coefficients with standard errors.
+Present model-averaged predictions with confidence intervals.
+
+---
+
+## Limitations and Caveats
+
+### The candidate set matters
+
+Model averaging cannot compensate for a poorly chosen candidate set.
+If all models are badly misspecified, averaging will not improve predictions.
+The candidate set should be theoretically motivated, not an exhaustive search.
+
+### Computational cost
+
+Fitting all $2^p$ subsets is infeasible for large $p$.
+Regularization (Session 4) is more scalable for high-dimensional problems.
+
+### Not a panacea for selection bias
+
+Model averaging reduces but does not eliminate selection bias.
+If models are data-selected (e.g., via stepwise), averaging them does not fix the underlying problem.
+
+### Interpretation complexity
+
+Averaged coefficients do not correspond to a single causal model.
+This complicates scientific interpretation and mechanistic understanding.
+
+---
+
+## AIC vs. BIC for Weights
+
+We can compute weights using BIC instead of AIC:
+
+$$w_k^{\text{BIC}} = \frac{\exp(-\Delta_k^{\text{BIC}} / 2)}{\sum_{j=1}^{K} \exp(-\Delta_j^{\text{BIC}} / 2)}$$
+
+where $\Delta_k^{\text{BIC}} = \text{BIC}_k - \min(\text{BIC})$.
+
+### Difference
+
+BIC penalizes complexity more heavily than AIC.
+BIC weights tend to concentrate more on a single best model.
+AIC weights spread more evenly across competitive models.
+
+The choice depends on the goal: AIC for prediction, BIC for parsimony.
+
+---
+
+## Combining Model Averaging with Cross-Validation
+
+We can validate model-averaged predictions using cross-validation.
+
+### Procedure
+
+Split data into training and test sets.
+Fit all candidate models on training data.
+Compute Akaike weights based on training data.
+Form model-averaged prediction for test data: $\hat{y}_{\text{avg}}(x_{\text{test}}) = \sum_k w_k \hat{y}_k(x_{\text{test}})$.
+Compare test error of averaged predictions versus single-model predictions.
+
+This assesses whether model averaging improves out-of-sample performance.
+
+Empirical studies typically show model averaging equals or outperforms single-model selection on test data.
+
+---
+
+## Variable Importance
+
+Model averaging provides a natural measure of variable importance.
+
+For predictor $x_j$, define:
+
+$$I(x_j) = \sum_{k: x_j \in \mathcal{M}_k} w_k$$
+
+This is the sum of weights over all models that include $x_j$.
+
+### Interpretation
+
+$I(x_j) = 1$ means $x_j$ appears in all competitive models (strong evidence for inclusion).
+$I(x_j) \approx 0$ means $x_j$ appears only in models with negligible weight (weak evidence).
+$0 < I(x_j) < 1$ indicates uncertainty about whether $x_j$ should be included.
+
+This measure is more informative than binary inclusion/exclusion from a single selected model.
+
+---
+
+## Looking Ahead
+
+### This session
+
+We covered model averaging as an alternative to single-model selection.
+
+### Next session
+
+We will cover special topics including model selection for mixed models, the distinction between prediction, explanation, and causation, and best practices for transparent reporting of model selection.
+
+### Key concepts established
+
+Model averaging acknowledges model uncertainty by weighting predictions across competitive models.
+Akaike weights measure relative empirical support for each model.
+Model averaging often improves prediction compared to single-model selection.
+The confidence set contains models accounting for 95% of cumulative weight.
+Model-averaged coefficients and variable importance measures provide richer inference than single-model selection.

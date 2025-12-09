@@ -1,0 +1,274 @@
+---
+title: "Session 3: Model Comparison Frameworks"
+subtitle: "Model Selection and Model Simplification"
+---
+
+## The Model Comparison Problem
+
+We have a candidate set $\{\mathcal{M}_1, \ldots, \mathcal{M}_K\}\ $ of models for the same data.
+
+Our goal is to determine which model or models have empirical support.
+
+A key distinction is whether models are nested or non-nested, as this determines the appropriate comparison method.
+
+### This session
+
+For nested models, we use likelihood ratio tests.
+For non-nested models, we use information criteria (or more generally, cross-validation).
+When comparing multiple models, we must address inflation of selection bias.
+We emphasize transparent reporting practices.
+
+---
+
+## Nested vs. Non-Nested Models
+
+### Nested models
+
+Model $\mathcal{M}_0$ is nested within $\mathcal{M}_1$ if $\mathcal{M}_0$ can be obtained from $\mathcal{M}_1$ by fixing some parameters.
+Formally, $\mathcal{M}_0 \subset \mathcal{M}_1$.
+
+For example, $y = \beta_0 + \beta_1 x_1 + \varepsilon\ $ is nested within $y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \varepsilon\ $ by setting $\beta_2 = 0$.
+
+### Non-nested models
+
+Non-nested models are those where neither model is a special case of the other.
+
+Examples include $y = \beta_0 + \beta_1 x_1 + \varepsilon\ $ versus $y = \beta_0 + \beta_2 x_2 + \varepsilon\ $, different functional forms of the models,  and different link functions in GLMs.
+
+---
+
+## Why the Distinction Matters
+
+### Nested models
+
+We can use the likelihood ratio test (LRT).
+The test statistic has a known $\chi^2$ distribution under the null hypothesis.
+This provides a p-value for testing the simpler versus more complex model.
+The test is asymptotically valid.
+
+### Non-nested models
+
+The LRT is not valid because the models are not special cases of each other.
+There is no nesting structure to exploit.
+We must use alternative methods such as information criteria or cross-validation.
+No p-value is available.
+
+The implication is that we must identify the nesting structure before choosing a comparison method.
+
+---
+
+## Likelihood Ratio Test: Setup
+
+We compare nested models $\mathcal{M}_0 \subset \mathcal{M}_1$.
+
+Model $\mathcal{M}_0$ is the "null" model, which is simpler and has $k_0$ parameters.
+Model $\mathcal{M}_1$ is the "alternative" model, which is more complex and has $k_1$ parameters.
+
+Under the null hypothesis $H_0$, the simpler model $\mathcal{M}_0$ is adequate.
+Under $H_1$, the additional parameters in $\mathcal{M}_1$ improve the fit.
+
+### Test statistic
+
+$$\text{LRT} = -2[\log L_0 - \log L_1] = -2\log\left(\frac{L_0}{L_1}\right)$$
+
+where $L_0$ and $L_1$ are the maximized likelihoods under each model.
+
+Under $H_0$, $\text{LRT} \sim \chi^2_{k_1 - k_0}$.
+
+---
+
+## Why the $\chi^2$ distribution?
+
+Under regularity conditions and when $H_0$ is true, the additional parameters in $\mathcal{M}_1$ equal zero in the population.
+Maximum likelihood estimators are asymptotically normal.
+The statistic $-2\log(\text{likelihood ratio})\ $ follows a $\chi^2$ distribution with degrees of freedom equal to the difference in parameters.
+
+The degrees of freedom are $\text{df} = k_1 - k_0$.
+
+We reject $H_0$ (favoring the more complex model) if $\text{LRT} > \chi^2_{k_1-k_0, \alpha}\ $, or equivalently if $p < \alpha$.
+
+Note that this is a hypothesis test, not model selection per se.
+Rejecting $H_0$ does not mean $\mathcal{M}_1$ is the "best model"; it only means it fits significantly better than $\mathcal{M}_0$.
+
+---
+
+## LRT Example: Nested Linear Models
+
+Model 0 is $y = \beta_0 + \beta_1 x_1 + \varepsilon$.
+Model 1 is $y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \beta_3 x_3 + \varepsilon$.
+
+The question is whether $x_2$ and $x_3$ significantly improve the fit.
+
+The test statistic is:
+
+$$\text{LRT} = -2[\log L_0 - \log L_1] = n[\log(\text{RSS}_0) - \log(\text{RSS}_1)]$$
+
+for linear models with normal errors.
+
+The degrees of freedom are $\text{df} = 3 - 1 = 2$.
+
+Under $H_0$, we have $\beta_2 = \beta_3 = 0$, so $\text{LRT} \sim \chi^2_2$.
+
+We compute $p = P(\chi^2_2 > \text{LRT})$.
+
+---
+
+## Connection to F-test
+
+For linear models with normal errors, the LRT is equivalent to the F-test.
+
+The F-statistic is:
+
+$$F = \frac{(\text{RSS}_0 - \text{RSS}_1)/(k_1 - k_0)}{\text{RSS}_1/(n - k_1)}$$
+
+The relationship is:
+
+$$\text{LRT} \approx (k_1 - k_0) \cdot F \quad \text{for large } n$$
+
+Both test the same hypothesis: that the additional parameters are jointly zero.
+
+*Practical advice*: 
+Use the F-test for linear models because it has an exact finite-sample distribution.
+Use the LRT for GLMs and nonlinear models because it has an asymptotic distribution.
+
+---
+
+## Multiple Testing Problem with LRT
+
+Consider comparing a sequence $\mathcal{M}_0 \subset \mathcal{M}_1 \subset \cdots \subset \mathcal{M}_K$.
+
+A naive approach is to test each pair sequentially using $\alpha = 0.05$.
+
+The problem is that the family-wise error rate (FWER) inflates:
+
+$$P(\text{at least one false rejection}) = 1 - (1 - \alpha)^m$$
+
+For $m = 10$ tests, FWER $= 1 - 0.95^{10} \approx 0.40$.
+
+The consequence is a high probability of selecting an overly complex model by chance.
+
+*Solutions*: Use the Bonferroni correction: apply $\alpha/m$ for each test (though this is conservative).
+Use information criteria instead, which involve a single selection with no multiple testing.
+Report all models considered, not just those deemed "significant".
+
+---
+
+## Non-Nested Model Comparison
+
+For non-nested models, we use information criteria from Session 2.
+
+For each model, we calculate AIC, AICc, or BIC.
+We rank models by criterion value, where lower is better.
+We compute $\Delta_i = \text{IC}_i - \min(\text{IC})$.
+
+### Interpreting $\Delta$ values
+
+When $\Delta < 2$, there is substantial support for the model.
+When $\Delta$ is between 4 and 7, there is less support.
+When $\Delta > 10$, there is essentially no support.
+
+Note that there are no p-values because these are not hypothesis tests.
+This is an evidence framework rather than an accept/reject decision.
+
+---
+
+## Comparing Many Models: Multiple Comparisons
+
+*The scenario*: A researcher fits many models and reports only the "best" one.
+
+*The problem*: Selection bias inflates the apparent performance.
+The best AIC among 20 random models will appear meaningful even if all models are equally bad in truth.
+Post-selection inference is invalid.
+
+*An example*: Generate 20 random predictors that are pure noise.
+Fit all $2^{20} = 1,048,576\ $ subsets.
+The "best" model by AIC will have spuriously good fit and low p-values.
+The consequence is that published "best models" systematically overfit.
+
+---
+
+## Addressing Multiple Comparisons
+
+*Transparency*: Report all models fit, not just the winner.
+Provide a table of all candidate models with IC values.
+Show $\Delta$ AIC for each model.
+Acknowledge when model selection was data-driven.
+
+*Limit candidates*: Use theory and prior knowledge to define a small set.
+Do not fit all possible subsets.
+Pre-specify 3-5 theoretically motivated models.
+
+*Additional strategies*: Use hold-out validation to confirm the selected model on independent data.
+Use model averaging to acknowledge uncertainty (Session 5).
+Pre-register the model selection strategy before seeing the data.
+
+---
+
+## Reporting Model Comparisons
+
+*Bad practice*: "We fit various models and selected the best one based on AIC."
+
+This does not say which models were fit, how many were considered, or what their AICs were.
+
+*Good practice*: 
+Provide a comparison table:
+
+| Model | k | Log-Lik | AIC | ΔAIC | Weight |
+|-------|---|---------|-----|------|--------|
+| M1    | 3 | -450.2  | 906.4 | 5.8  | 0.02  |
+| M2    | 5 | -445.1  | 900.2 | 0.0  | 0.73  |
+| M3    | 7 | -444.8  | 903.6 | 3.4  | 0.13  |
+| M4    | 9 | -444.5  | 907.0 | 6.8  | 0.02  |
+
+Interpretation: M2 has the most support (Δ AIC = 0), but M3 is competitive (Δ AIC = 3.4).
+
+---
+
+## Model Comparison Workflow
+
+- First, define the candidate set using theory and prior knowledge.
+- Second, check the nesting structure: use LRT for nested models and information criteria for non-nested models.
+- Third, fit all models to the same data.
+- Fourth, calculate comparison statistics (LRT or AIC).
+- Fifth, create a comparison table with all models.
+- Sixth, identify competitive models where Δ AIC < 4.
+- Seventh, validate on hold-out data if available.
+- Eighth, report transparently by showing all models, not just the winner.
+
+Avoid sequential testing, stepwise procedures, and reporting only the final model.
+
+---
+
+## Special Cases and Caveats
+
+We cannot compare $\log(y) \sim x\ $ versus $y \sim x$ using AIC directly.
+We must use the same response variable or back-transform predictions.
+
+AIC is valid only if we use the same data and link function.
+We cannot compare a binomial versus Poisson GLM on the same data.
+
+LRT requires ML estimation, not REML.
+REML produces biased likelihoods when comparing fixed effects.
+
+All comparison methods assume the candidate set contains a reasonable approximation.
+If all models are badly misspecified, selection may not be meaningful.
+
+---
+
+## Looking Ahead
+
+### This session
+
+We covered frameworks for comparing models systematically.
+
+### Next session
+
+We will cover variable selection: which predictors to include when many candidates exist.
+This includes problems with stepwise selection, all-subsets approaches, and regularization methods such as lasso, ridge, and elastic net.
+
+### Key concepts established
+
+Nested versus non-nested models require different methods.
+We use LRT for nested models and AIC for non-nested models.
+Multiple comparisons inflate selection bias.
+Transparent reporting is essential.

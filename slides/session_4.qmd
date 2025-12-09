@@ -1,0 +1,378 @@
+---
+title: "Session 4: Variable Selection"
+subtitle: "Model Selection and Model Simplification"
+---
+
+## The Variable Selection Problem
+
+We have an outcome $y$ and a large set of candidate predictors $\mathbf{x} = (x_1, x_2, \ldots, x_p)$.
+
+The goal is to identify which subset of predictors should enter the model.
+
+This problem is ubiquitous in empirical research.
+Theory suggests many potential predictors.
+Sample size limits the number of parameters we can reliably estimate.
+Inclusion of irrelevant predictors inflates variance.
+Exclusion of relevant predictors inflates bias.
+
+### This session
+
+We examine why stepwise selection is problematic.
+We explore all-subsets selection with information criteria.
+We introduce regularization methods that perform continuous shrinkage rather than discrete selection.
+
+---
+
+## Why Not Just Include Everything?
+
+Consider a model with $p$ candidate predictors and sample size $n$.
+
+### Statistical problems
+
+Parameter estimates become unstable when $p$ is large relative to $n$.
+Standard errors inflate due to multicollinearity.
+The model fails completely when $p > n$ because the design matrix is not full rank.
+Degrees of freedom become $n - p - 1$, which approaches zero as $p$ grows.
+
+### Overfitting and variance inflation
+
+Each additional parameter increases model variance.
+The bias-variance tradeoff suggests an optimal complexity less than the full model.
+Out-of-sample prediction error increases when too many predictors are included.
+
+The consequence is that we need a principled approach to select a subset of predictors or to shrink their coefficients.
+
+---
+
+## Stepwise Selection: The Approach
+
+Stepwise selection adds or removes one predictor at a time based on a criterion.
+
+### Forward selection
+
+Start with the intercept-only model.
+At each step, add the predictor that most improves fit according to some criterion such as AIC or p-value.
+Stop when no remaining predictor improves the criterion.
+
+### Backward elimination
+
+Start with the full model containing all $p$ predictors.
+At each step, remove the predictor whose removal least degrades fit.
+Stop when removing any predictor degrades the criterion.
+
+### Stepwise (bidirectional)
+
+Combine forward and backward steps.
+At each iteration, consider both adding and removing predictors.
+
+---
+
+## Stepwise Selection: Why It Fails
+
+Despite being widely used, stepwise selection has severe problems.
+
+### Problem 1: Overfitting and selection bias
+
+The final model is chosen to minimize training error among all paths explored.
+This induces selection bias: the selected model appears better than it truly is.
+Standard errors and p-values are invalid because they ignore the search process.
+Post-selection inference treats the selected model as if it were pre-specified, which is incorrect.
+
+### Problem 2: Instability
+
+Small changes in the data can produce entirely different selected models.
+The order of entry is highly sensitive to sampling variability.
+This instability indicates that the procedure is overfitting noise rather than capturing signal.
+
+---
+
+## Stepwise Selection: More Problems
+
+### Problem 3: Inflated Type I error
+
+Because we test many hypotheses sequentially, the family-wise error rate inflates dramatically.
+Even with $\alpha = 0.05$ at each step, the overall error rate can exceed 0.40.
+This leads to including spurious predictors that have no true relationship with the outcome.
+
+### Problem 4: Ignores multicollinearity
+
+The criterion at each step is conditional on the current model.
+Correlated predictors can arbitrarily enter or not enter based on noise.
+The procedure does not account for joint effects or redundancy among predictors.
+
+### Consequence
+
+Stepwise selection is not a valid method for inference or for reliable prediction.
+It is exploration, not confirmation.
+
+---
+
+## Demonstrating Stepwise Instability
+
+### Setup
+
+Generate data where no predictors are truly related to the outcome.
+Fit forward stepwise selection based on AIC.
+
+### What happens?
+
+Despite all predictors being pure noise, stepwise will select a subset.
+The selected model will have low p-values and good training fit.
+Repeating on a new sample from the same population produces a completely different selected model.
+
+### Interpretation
+
+The selected model is entirely spurious.
+The procedure capitalizes on chance correlations in the training data.
+This demonstrates that stepwise can produce confident but wrong conclusions.
+
+We will demonstrate this empirically in the workshop using simulation.
+
+---
+
+## All-Subsets Selection with AIC
+
+An alternative to stepwise is to fit all possible subsets and rank by AIC.
+
+### Procedure
+
+With $p$ candidate predictors, there are $2^p$ possible models (including and excluding each predictor).
+Fit all $2^p$ models.
+Calculate AIC for each model.
+Rank models by AIC and identify those with $\Delta \text{AIC} < 2$.
+
+### Advantages over stepwise
+
+All-subsets is deterministic: the best model by AIC is guaranteed to be found.
+There is no arbitrary path dependence.
+We can identify multiple competitive models rather than forcing a single selection.
+
+---
+
+## All-Subsets: Limitations
+
+### Computational cost
+
+Fitting $2^p$ models becomes infeasible for large $p$.
+For $p = 20$, we must fit over 1 million models.
+For $p = 30$, over 1 billion models.
+
+### Selection bias remains
+
+Even with all-subsets AIC, post-selection inference is invalid.
+Standard errors and p-values for the selected model are too optimistic.
+The best AIC among $2^p$ models will appear spuriously good when all models are equally bad.
+
+### Practical constraint
+
+All-subsets is feasible only when $p$ is small, typically $p < 15$.
+For larger $p$, we need alternative methods.
+
+---
+
+## Regularization: A Different Approach
+
+Rather than selecting a subset, regularization shrinks coefficient estimates toward zero.
+
+The general form is:
+
+$$\hat{\beta}_{\text{reg}} = \arg\min_{\beta} \left\{ \sum_{i=1}^{n}(y_i - \mathbf{x}_i'\beta)^2 + \lambda \cdot \text{Penalty}(\beta) \right\}$$
+
+where $\lambda \geq 0$ controls the strength of the penalty.
+
+The penalty term discourages large coefficient values.
+As $\lambda$ increases, coefficients shrink toward zero.
+When $\lambda = 0$, we recover ordinary least squares.
+When $\lambda \to \infty$, all coefficients approach zero.
+
+This approach is continuous rather than discrete: coefficients shrink smoothly rather than being included or excluded.
+
+---
+
+## Ridge Regression (L2 Penalty)
+
+Ridge regression uses an L2 penalty on the coefficient magnitudes:
+
+$$\hat{\beta}_{\text{ridge}} = \arg\min_{\beta} \left\{ \sum_{i=1}^{n}(y_i - \mathbf{x}_i'\beta)^2 + \lambda \sum_{j=1}^{p}\beta_j^2 \right\}$$
+
+The penalty is $\lambda \|\beta\|_2^2 = \lambda \sum_{j=1}^{p}\beta_j^2$.
+
+### Properties
+
+Ridge shrinks all coefficients toward zero but never sets any exactly to zero.
+It performs shrinkage, not selection.
+It is particularly effective when predictors are correlated because it distributes coefficient mass among correlated predictors.
+Ridge has a closed-form solution: $\hat{\beta}_{\text{ridge}} = (\mathbf{X}'\mathbf{X} + \lambda \mathbf{I})^{-1}\mathbf{X}'\mathbf{y}$.
+
+The addition of $\lambda \mathbf{I}$ stabilizes the inverse, allowing estimation even when $p > n$.
+
+---
+
+## Lasso (L1 Penalty)
+
+Lasso uses an L1 penalty on the absolute coefficient values:
+
+$$\hat{\beta}_{\text{lasso}} = \arg\min_{\beta} \left\{ \sum_{i=1}^{n}(y_i - \mathbf{x}_i'\beta)^2 + \lambda \sum_{j=1}^{p}|\beta_j| \right\}$$
+
+The penalty is $\lambda \|\beta\|_1 = \lambda \sum_{j=1}^{p}|\beta_j|$.
+
+### Properties
+
+Lasso performs both shrinkage and selection.
+It sets some coefficients exactly to zero, producing a sparse model.
+The L1 penalty has a geometric property that induces sparsity: the constraint region has corners where some coefficients equal zero.
+Lasso does not have a closed-form solution and requires iterative optimization.
+
+### When to use lasso
+
+Lasso is preferred when we believe many predictors are irrelevant.
+It produces interpretable models with a subset of predictors.
+It is effective for high-dimensional problems where $p$ is large.
+
+---
+
+## Elastic Net
+
+Elastic net combines L1 and L2 penalties:
+
+$$\hat{\beta}_{\text{enet}} = \arg\min_{\beta} \left\{ \sum_{i=1}^{n}(y_i - \mathbf{x}_i'\beta)^2 + \lambda \left[ \alpha \sum_{j=1}^{p}|\beta_j| + (1-\alpha) \sum_{j=1}^{p}\beta_j^2 \right] \right\}$$
+
+The parameter $\alpha \in [0, 1]$ controls the mix between lasso ($\alpha = 1$) and ridge ($\alpha = 0$).
+
+### Why elastic net?
+
+Lasso can select at most $n$ predictors when $p > n$.
+Lasso tends to select only one predictor from a group of correlated predictors.
+Ridge includes all predictors but does not perform selection.
+
+Elastic net inherits advantages of both: it performs selection like lasso but handles correlated predictors more stably like ridge.
+
+---
+
+## Choosing the Penalty Parameter $\lambda$
+
+The penalty parameter $\lambda$ controls the bias-variance tradeoff.
+
+Small $\lambda$ means little shrinkage, giving low bias but high variance.
+Large $\lambda$ means heavy shrinkage, giving high bias but low variance.
+
+We select $\lambda$ by cross-validation.
+
+### Procedure
+
+Specify a grid of candidate $\lambda$ values, such as $\lambda \in \{0.001, 0.01, 0.1, 1, 10, 100\}$.
+For each $\lambda$, compute k-fold cross-validation error.
+Select $\lambda$ that minimizes CV error.
+Refit the model on the full data using the selected $\lambda$.
+
+This approach estimates out-of-sample performance for each $\lambda$ and selects the value that balances bias and variance optimally.
+
+---
+
+## Comparing Methods
+
+### Stepwise selection
+
+Fast and widely used.
+Produces a single selected model.
+Severely biased: overfits and produces invalid inference.
+Unstable: different data produce different selections.
+
+### All-subsets with AIC
+
+Deterministic and exhaustive.
+Identifies multiple competitive models.
+Computationally infeasible for $p > 15$.
+Still suffers from selection bias.
+
+### Regularization (lasso, ridge, elastic net)
+
+Handles high-dimensional problems where $p$ is large or even $p > n$.
+Performs continuous shrinkage rather than discrete selection.
+Requires cross-validation to choose $\lambda$.
+Introduces bias but reduces variance, improving prediction.
+
+---
+
+## Practical Recommendations
+
+### When $p$ is small ($p < 10$)
+
+Use all-subsets selection with AICc.
+Report all competitive models with $\Delta \text{AICc} < 2$.
+Consider model averaging (Session 5).
+
+### When $p$ is moderate ($10 < p < 30$)
+
+Use lasso or elastic net with cross-validation.
+Examine the stability of selected variables by repeating on bootstrap samples.
+Report coefficient paths showing how selection changes with $\lambda$.
+
+### When $p$ is large ($p > 30$) or $p > n$
+
+Use elastic net with cross-validation.
+Interpret selected variables cautiously: selection is unstable.
+Focus on prediction performance rather than inference.
+
+### Never
+
+Do not use stepwise selection for inference.
+Do not report p-values from a stepwise-selected model without acknowledging selection bias.
+
+---
+
+## Coefficient Paths
+
+A useful diagnostic is to plot coefficient estimates as a function of $\lambda$.
+
+For lasso and elastic net, this shows:
+- Which predictors enter the model first (at small $\lambda$).
+- Which predictors remain in the model at moderate $\lambda$.
+- How coefficients shrink continuously as $\lambda$ increases.
+
+Variables that enter early and remain stable across a range of $\lambda$ are more reliable.
+Variables that enter late or are unstable are likely noise.
+
+We will construct these plots in the workshop using the glmnet package.
+
+---
+
+## Inference After Selection
+
+### The problem
+
+Standard errors and confidence intervals from a selected model are too narrow.
+P-values are too small because they do not account for the search process.
+This applies to stepwise, all-subsets, and regularization.
+
+### Approaches to valid inference
+
+Use data splitting: select the model on one half of the data, perform inference on the other half.
+Use post-selection inference methods, such as selective inference or the bootstrap.
+Report that the model was data-selected and interpret coefficients cautiously.
+Focus on prediction performance via cross-validation rather than p-values.
+
+### Practical advice
+
+If the goal is inference, pre-specify the model before seeing the data.
+If the model is data-selected, acknowledge this and do not over-interpret p-values.
+
+---
+
+## Looking Ahead
+
+### This session
+
+We covered the variable selection problem and methods for choosing predictors.
+
+### Next session
+
+We will cover model averaging: rather than selecting a single model, we average predictions across multiple models weighted by their empirical support.
+This acknowledges model uncertainty and often improves prediction.
+
+### Key concepts established
+
+Stepwise selection is problematic due to overfitting, instability, and invalid inference.
+All-subsets selection is exhaustive but computationally limited.
+Regularization methods (lasso, ridge, elastic net) perform continuous shrinkage and handle high-dimensional problems.
+Cross-validation is used to select the penalty parameter $\lambda$.

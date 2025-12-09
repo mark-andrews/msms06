@@ -1,0 +1,202 @@
+---
+title: "Session 1: The Model Selection Problem"
+subtitle: "Model Selection and Model Simplification"
+---
+
+## The Fundamental Challenge
+
+In empirical research, we face a ubiquitous problem.
+We have an outcome variable $y$ (which may be continuous, binary, or count data), a set of candidate predictors $\mathbf{x} = (x_1, x_2, \ldots, x_p)$ , a finite sample of $n$ observations, and uncertainty about the true data-generating process.
+
+A central question is: which functional form and which predictors should be used in the model?
+
+This question is unavoidable for several reasons:
+
+- Theory rarely specifies exact functional forms.
+- Multiple competing theoretical models often exist.
+- Exploratory analysis suggests many potential predictors.
+- Sample size limits the complexity we can reliably estimate.
+
+---
+
+## Why Model Selection is Non-Trivial
+
+We cannot simply "include everything" in the model.
+
+### Statistical problems
+
+Including all predictors leads to variance inflation with correlated predictors.
+We lose degrees of freedom (which become $n - p - 1$).
+Parameter estimates become unreliable when $p$ approaches $n$.
+The model fails completely when $p > n$.
+
+### Overfitting
+
+The model captures sample-specific noise as if it were signal.
+This produces excellent fit to training data but poor generalization.
+Post-selection inference suffers from inflated Type I error rates.
+
+The paradox: more complex models always fit training data better, yet often predict worse on new data.
+
+---
+
+## Training Error vs. Test Error
+
+Let $\mathcal{D}_{\text{train}}$ be training data and $\mathcal{D}_{\text{test}}$ be new data.
+
+Training error is $\text{Err}_{\text{train}} = \frac{1}{n}\sum_{i=1}^{n}(y_i - \hat{f}(x_i))^2\ \ $ where $\hat{f}$ is fit to $\mathcal{D}_{\text{train}}$.
+
+Test error is $\text{Err}_{\text{test}} = \mathbb{E}[(y_{\text{new}} - \hat{f}(x_{\text{new}}))^2]\ \ $ for new observations.
+
+### Key asymmetry
+
+Training error is optimistically biased: it underestimates true prediction error.
+Training error always decreases (or stays constant) as model complexity increases.
+Test error is U-shaped: it decreases initially, then increases with excessive complexity.
+
+The implication is that in-sample fit statistics ($R^2$, residual deviance) are poor guides for model selection.
+
+---
+
+## The Bias-Variance Decomposition
+
+Consider the regression problem: $y = f(x) + \varepsilon\ $ where $\mathbb{E}[\varepsilon] = 0$, $\text{Var}(\varepsilon) = \sigma^2$.
+
+For estimator $\hat{f}(x)$ trained on random sample $\mathcal{D}$, expected squared prediction error at point $x$ is:
+
+$$
+\begin{align}
+\mathbb{E}_{\mathcal{D}}[(y - \hat{f}(x))^2] &= \mathbb{E}_{\mathcal{D}}[(f(x) + \varepsilon - \hat{f}(x))^2] \\
+&= \mathbb{E}_{\mathcal{D}}[(f(x) - \hat{f}(x))^2] + \sigma^2
+\end{align}
+$$
+
+Decompose the first term by adding and subtracting $\mathbb{E}_{\mathcal{D}}[\hat{f}(x)]$:
+
+$$
+\mathbb{E}_{\mathcal{D}}[(f(x) - \hat{f}(x))^2] = \underbrace{\left(f(x) - \mathbb{E}_{\mathcal{D}}[\hat{f}(x)]\right)^2}_{\text{Bias}^2(\hat{f}(x))} + \underbrace{\mathbb{E}_{\mathcal{D}}\left[(\hat{f}(x) - \mathbb{E}_{\mathcal{D}}[\hat{f}(x)])^2\right]}_{\text{Var}(\hat{f}(x))}
+$$
+
+---
+
+## The Fundamental Tradeoff
+
+$$\text{Expected Prediction Error} = \text{Bias}^2 + \text{Variance} + \text{Irreducible Error}$$
+
+Bias is the systematic error from model misspecification.
+It is high when the model is too simple (underfitting).
+An example is a linear fit to a nonlinear relationship.
+
+Variance is the prediction variability across training samples.
+It is high when the model is too complex (overfitting).
+An example is a high-degree polynomial fit to a small sample.
+
+Irreducible error is $\sigma^2 = \text{Var}(\varepsilon)\ $, which cannot be reduced by better modeling.
+It represents the fundamental stochasticity in $y$.
+
+---
+
+## Model Complexity and the Tradeoff
+
+As model complexity increases (through more parameters, higher polynomial degree, etc.), bias and variance change in opposite directions.
+
+*Bias decreases*: More flexible models can approximate $f(x)$ more closely.
+We have $\mathbb{E}_{\mathcal{D}}[\hat{f}(x)] \to f(x)\ $ as flexibility increases.
+Eventually bias $\approx 0$ for a sufficiently complex model.
+
+*Variance increases*: More parameters must be estimated from the same $n$ observations.
+Each parameter estimate has greater uncertainty.
+Predictions become increasingly sample-dependent.
+Variance can grow without bound as $p \to n$.
+
+*Total error is U-shaped*: Initially, bias reduction dominates, so error decreases.
+Eventually, variance increase dominates, so error increases.
+Optimal complexity balances bias and variance.
+
+---
+
+## Underfitting: High Bias, Low Variance
+
+### Characteristics
+
+The model is too simple relative to true $f(x)$.
+It has few parameters and a rigid functional form.
+It cannot capture the true signal in the data.
+
+### Consequences
+
+We have $\mathbb{E}_{\mathcal{D}}[\hat{f}(x)]$ far from $f(x)$, which gives large bias.
+However, predictions are stable across samples, giving low variance.
+Performance is poor on both training and test data.
+Predictions exhibit systematic errors.
+
+An example is linear regression when the true relationship is nonlinear with interactions.
+
+---
+
+## Overfitting: Low Bias, High Variance
+
+### Characteristics
+
+The model is too complex relative to true $f(x)$ and sample size $n$.
+It has many parameters and a highly flexible functional form.
+It captures noise as if it were signal.
+
+### Consequences
+
+On average, $\mathbb{E}_{\mathcal{D}}[\hat{f}(x)] \approx f(x)$, giving low bias.
+However, individual predictions are highly variable, giving high variance.
+Performance is excellent on training data but poor on test data.
+There is a large gap between training and test error.
+
+An example is a 15th-degree polynomial fit to data generated from a cubic function with $n = 50$.
+
+---
+
+## Why Training Error Always Decreases
+
+Consider nested sequence of models $\mathcal{M}_1 \subset \mathcal{M}_2 \subset \cdots \subset \mathcal{M}_k$ where $\mathcal{M}_j$ has $j$ parameters.
+
+For least squares estimation:
+
+$$\hat{\beta}_j = \arg\min_{\beta \in \mathcal{M}_j} \sum_{i=1}^{n}(y_i - x_i'\beta)^2$$
+
+By definition of the optimization:
+
+$$\min_{\beta \in \mathcal{M}_j} \sum_{i=1}^{n}(y_i - x_i'\beta)^2 \geq \min_{\beta \in \mathcal{M}_{j+1}} \sum_{i=1}^{n}(y_i - x_i'\beta)^2$$
+
+Therefore: $\text{RSS}_j \geq \text{RSS}_{j+1}$ and $R^2_j \leq R^2_{j+1}$.
+
+The implication is that comparing models on training error alone guarantees selecting the most complex model, regardless of generalization performance.
+
+---
+
+## The Model Selection Problem Formalized
+
+*Goal*: Select model $\hat{\mathcal{M}}$ from candidate set $\{\mathcal{M}_1, \ldots, \mathcal{M}_K\}$ that minimizes expected prediction error:
+
+$$\hat{\mathcal{M}} = \arg\min_{\mathcal{M}_k} \mathbb{E}[(y_{\text{new}} - \hat{f}_k(x_{\text{new}}))^2]$$
+
+*Challenges*: We cannot directly compute $\mathbb{E}[(y_{\text{new}} - \hat{f}_k(x_{\text{new}}))^2]\ $ because this requires a population of new observations.
+Training error $\frac{1}{n}\sum_{i=1}^{n}(y_i - \hat{f}_k(x_i))^2$ is a biased estimate that is too optimistic.
+
+*Solution approaches*: We can estimate out-of-sample error via cross-validation.
+We can adjust training error using information criteria such as AIC or BIC.
+We can penalize complexity directly via regularization methods such as lasso or ridge.
+
+---
+
+## Looking Ahead
+
+### This session
+
+We will demonstrate overfitting and underfitting empirically with real data.
+We will fit models of varying complexity, compare training versus test error, observe the U-shaped test error curve, and see the bias-variance tradeoff in action.
+
+### Remaining sessions
+
+Session 2 covers cross-validation and information criteria for model evaluation.
+Session 3 covers frameworks for comparing multiple models, including likelihood ratio tests and AIC differences.
+Session 4 covers variable selection methods and regularization.
+Session 5 covers model averaging when multiple models have similar support.
+Session 6 covers special topics including mixed models, the distinction between prediction and causation, and reporting practices.

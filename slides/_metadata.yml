@@ -1,0 +1,8 @@
+format:
+  revealjs:
+    theme: slides.scss
+    footer: "[mark-andrews.github.io/msms/](https://mark-andrews.github.io/msms/)"
+    slide-number: c/t
+    incremental: false
+    chalkboard: true
+    preview-links: auto
