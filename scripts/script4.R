@@ -66,7 +66,7 @@ lasso_fit <- glmnet(x = X, y = y, alpha = 1)
 plot(lasso_fit, label = TRUE)
 
 
-cv_lasso_fit <- cv.glmnet(x = X, y = y, alpha = 1)
+cv_lasso_fit <- cv.glmnet(x = X, y = y, alpha = 1) # alpha = 0 is ridge regression
 plot(cv_lasso_fit)
 
 # optimal model
@@ -87,4 +87,8 @@ coef(cv_lasso_fit, s = "lambda.1se") |>
   as.matrix() |>
   as_tibble(rownames = "var")
 
-lm(y ~ X) |> broom::tidy()
+# standard linear regression
+library(broom)
+lm(y ~ X) |> tidy()
+
+# elastic net via tune_elastic_net
