@@ -55,3 +55,36 @@ ames_subset_lm |>
   mutate(weight = round(akaike_weights(aic), 3))
 
 # Elastic net -------------------------------------------------------------
+
+library(glmnet)
+
+# glmnet requires a matrix of predictors and a vector response
+X <- select(ames, Year_Built, Year_Remod_Add, Gr_Liv_Area, Full_Bath, Bedroom_AbvGr, TotRms_AbvGrd, Garage_Cars) |> as.matrix()
+y <- ames$Sale_Price
+
+lasso_fit <- glmnet(x = X, y = y, alpha = 1)
+plot(lasso_fit, label = TRUE)
+
+
+cv_lasso_fit <- cv.glmnet(x = X, y = y, alpha = 1)
+plot(cv_lasso_fit)
+
+# optimal model
+cv_lasso_fit$lambda.min
+cv_lasso_fit$lambda.min |> log()
+
+cv_lasso_fit$lambda.1se
+cv_lasso_fit$lambda.1se |> log()
+
+coef(cv_lasso_fit, s = "lambda.min")
+coef(cv_lasso_fit, s = "lambda.1se")
+
+coef(cv_lasso_fit, s = "lambda.min") |>
+  as.matrix() |>
+  as_tibble(rownames = "var")
+
+coef(cv_lasso_fit, s = "lambda.1se") |>
+  as.matrix() |>
+  as_tibble(rownames = "var")
+
+lm(y ~ X) |> broom::tidy()
