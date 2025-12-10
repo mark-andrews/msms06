@@ -181,7 +181,6 @@
 </section>
 <section id="demonstrating-stepwise-instability" class="slide level2">
 <h2>Demonstrating Stepwise Instability</h2>
-<h3 id="setup">Setup</h3>
 <p>Generate data where no predictors are truly related to the outcome. Fit forward stepwise selection based on AIC.</p>
 <h3 id="what-happens">What happens?</h3>
 <p>Despite all predictors being pure noise, stepwise will select a subset. The selected model will have low p-values and good training fit. Repeating on a new sample from the same population produces a completely different selected model.</p>
@@ -230,7 +229,7 @@
 <p><span class="math display">\[\hat{\beta}_{\text{lasso}} = \arg\min_{\beta} \left\{ \sum_{i=1}^{n}(y_i - \mathbf{x}_i'\beta)^2 + \lambda \sum_{j=1}^{p}|\beta_j| \right\}\]</span></p>
 <p>The penalty is <span class="math inline">\(\lambda \|\beta\|_1 = \lambda \sum_{j=1}^{p}|\beta_j|\)</span>.</p>
 <h3 id="properties-1">Properties</h3>
-<p>Lasso performs both shrinkage and selection. It sets some coefficients exactly to zero, producing a sparse model. The L1 penalty has a geometric property that induces sparsity: the constraint region has corners where some coefficients equal zero. Lasso does not have a closed-form solution and requires iterative optimization.</p>
+<p>Lasso performs both shrinkage and selection. It sets some coefficients exactly to zero, producing a sparse model.</p>
 <h3 id="when-to-use-lasso">When to use lasso</h3>
 <p>Lasso is preferred when we believe many predictors are irrelevant. It produces interpretable models with a subset of predictors. It is effective for high-dimensional problems where <span class="math inline">\(p\)</span> is large.</p>
 </section>
@@ -249,8 +248,15 @@
 <p>Small <span class="math inline">\(\lambda\)</span> means little shrinkage, giving low bias but high variance. Large <span class="math inline">\(\lambda\)</span> means heavy shrinkage, giving high bias but low variance.</p>
 <p>We select <span class="math inline">\(\lambda\)</span> by cross-validation.</p>
 <h3 id="procedure-1">Procedure</h3>
-<p>Specify a grid of candidate <span class="math inline">\(\lambda\)</span> values, such as <span class="math inline">\(\lambda \in \{0.001, 0.01, 0.1, 1, 10, 100\}\)</span>. For each <span class="math inline">\(\lambda\)</span>, compute k-fold cross-validation error. Select <span class="math inline">\(\lambda\)</span> that minimizes CV error. Refit the model on the full data using the selected <span class="math inline">\(\lambda\)</span>.</p>
+<p>Specify a grid of candidate <span class="math inline">\(\lambda\)</span> values, such as <span class="math inline">\(\lambda \in \{0.001, 0.01, 0.1, 1, 10, 100\}\ \ \)</span>. For each <span class="math inline">\(\lambda\)</span>, compute k-fold cross-validation error. Select <span class="math inline">\(\lambda\)</span> that minimizes CV error. Refit the model on the full data using the selected <span class="math inline">\(\lambda\)</span>.</p>
 <p>This approach estimates out-of-sample performance for each <span class="math inline">\(\lambda\)</span> and selects the value that balances bias and variance optimally.</p>
+</section>
+<section id="coefficient-paths" class="slide level2">
+<h2>Coefficient Paths</h2>
+<p>A useful diagnostic is to plot coefficient estimates as a function of <span class="math inline">\(\lambda\)</span>.</p>
+<p>For lasso and elastic net, this shows: - Which predictors enter the model first (at small <span class="math inline">\(\lambda\)</span>). - Which predictors remain in the model at moderate <span class="math inline">\(\lambda\)</span>. - How coefficients shrink continuously as <span class="math inline">\(\lambda\)</span> increases.</p>
+<p>Variables that enter early and remain stable across a range of <span class="math inline">\(\lambda\)</span> are more reliable. Variables that enter late or are unstable are likely noise.</p>
+<p>We will construct these plots in the workshop using the glmnet package.</p>
 </section>
 <section id="comparing-methods" class="slide level2">
 <h2>Comparing Methods</h2>
@@ -263,21 +269,12 @@
 </section>
 <section id="practical-recommendations" class="slide level2">
 <h2>Practical Recommendations</h2>
-<h3 id="when-p-is-small-p-10">When <span class="math inline">\(p\)</span> is small (<span class="math inline">\(p &lt; 10\)</span>)</h3>
+<h3 id="when-p-is-small-p-10">When <span class="math inline">\(p\)</span> is small (<span class="math inline">\(p &lt; 10\ \)</span>)</h3>
 <p>Use all-subsets selection with AICc. Report all competitive models with <span class="math inline">\(\Delta \text{AICc} &lt; 2\)</span>. Consider model averaging (Session 5).</p>
-<h3 id="when-p-is-moderate-10-p-30">When <span class="math inline">\(p\)</span> is moderate (<span class="math inline">\(10 &lt; p &lt; 30\)</span>)</h3>
+<h3 id="when-p-is-moderate-10-p-30">When <span class="math inline">\(p\)</span> is moderate (<span class="math inline">\(10 &lt; p &lt; 30\ \)</span>)</h3>
 <p>Use lasso or elastic net with cross-validation. Examine the stability of selected variables by repeating on bootstrap samples. Report coefficient paths showing how selection changes with <span class="math inline">\(\lambda\)</span>.</p>
-<h3 id="when-p-is-large-p-30-or-p-n">When <span class="math inline">\(p\)</span> is large (<span class="math inline">\(p &gt; 30\)</span>) or <span class="math inline">\(p &gt; n\)</span></h3>
+<h3 id="when-p-is-large-p-30-or-p-n">When <span class="math inline">\(p\)</span> is large (<span class="math inline">\(\ p &gt; 30\ \)</span>) or <span class="math inline">\(p &gt; n\)</span></h3>
 <p>Use elastic net with cross-validation. Interpret selected variables cautiously: selection is unstable. Focus on prediction performance rather than inference.</p>
-<h3 id="never">Never</h3>
-<p>Do not use stepwise selection for inference. Do not report p-values from a stepwise-selected model without acknowledging selection bias.</p>
-</section>
-<section id="coefficient-paths" class="slide level2">
-<h2>Coefficient Paths</h2>
-<p>A useful diagnostic is to plot coefficient estimates as a function of <span class="math inline">\(\lambda\)</span>.</p>
-<p>For lasso and elastic net, this shows: - Which predictors enter the model first (at small <span class="math inline">\(\lambda\)</span>). - Which predictors remain in the model at moderate <span class="math inline">\(\lambda\)</span>. - How coefficients shrink continuously as <span class="math inline">\(\lambda\)</span> increases.</p>
-<p>Variables that enter early and remain stable across a range of <span class="math inline">\(\lambda\)</span> are more reliable. Variables that enter late or are unstable are likely noise.</p>
-<p>We will construct these plots in the workshop using the glmnet package.</p>
 </section>
 <section id="inference-after-selection" class="slide level2">
 <h2>Inference After Selection</h2>

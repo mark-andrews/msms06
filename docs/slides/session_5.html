@@ -138,16 +138,14 @@
 <section id="the-model-uncertainty-problem" class="slide level2">
 <h2>The Model Uncertainty Problem</h2>
 <p>We have fit multiple models and identified several with similar empirical support.</p>
-<p>For example, models with <span class="math inline">\(\Delta \text{AIC} &lt; 2\)</span> are competitive.</p>
+<p>For example, models with <span class="math inline">\(\Delta \text{AIC} &lt; 2\ \)</span> are competitive.</p>
 <p>The traditional approach is to select one “best” model and ignore the others. This discards information about model uncertainty. It treats selection as if it were certain when it is not.</p>
-<h3 id="the-consequence">The consequence</h3>
-<p>Predictions from the selected model ignore uncertainty about which model is correct. Standard errors and confidence intervals are too narrow because they condition on the selected model. Post-selection inference is invalid.</p>
-<h3 id="an-alternative">An alternative</h3>
-<p>Model averaging acknowledges uncertainty by combining predictions across multiple models. We weight each model by its empirical support rather than selecting a single winner.</p>
+<p><em>The consequence</em>: Predictions from the selected model ignore uncertainty about which model is correct. Standard errors and confidence intervals are too narrow because they condition on the selected model. Post-selection inference is invalid.</p>
+<p><em>An alternative</em>: Model averaging acknowledges uncertainty by combining predictions across multiple models. We weight each model by its empirical support rather than selecting a single winner.</p>
 </section>
 <section id="what-is-model-averaging" class="slide level2">
 <h2>What is Model Averaging?</h2>
-<p>Rather than selecting model <span class="math inline">\(k^*\)</span> with minimum AIC, we form a weighted average across all <span class="math inline">\(K\)</span> candidate models.</p>
+<p>Rather than selecting model <span class="math inline">\(k^*\)</span> with, for example, minimum AIC, we form a weighted average across all <span class="math inline">\(K\)</span> candidate models.</p>
 <p>The model-averaged prediction for a new observation <span class="math inline">\(x_0\)</span> is:</p>
 <p><span class="math display">\[\hat{y}_{\text{avg}}(x_0) = \sum_{k=1}^{K} w_k \cdot \hat{y}_k(x_0)\]</span></p>
 <p>where <span class="math inline">\(w_k\)</span> is the weight assigned to model <span class="math inline">\(k\)</span> and <span class="math inline">\(\hat{y}_k(x_0)\)</span> is the prediction from model <span class="math inline">\(k\)</span>.</p>
@@ -161,30 +159,24 @@
 <p><span class="math display">\[\Delta_k = \text{AIC}_k - \min(\text{AIC})\]</span></p>
 <p>The Akaike weight is:</p>
 <p><span class="math display">\[w_k = \frac{\exp(-\Delta_k / 2)}{\sum_{j=1}^{K} \exp(-\Delta_j / 2)}\]</span></p>
-<h3 id="interpretation">Interpretation</h3>
-<p>The weight <span class="math inline">\(w_k\)</span> can be interpreted as the probability that model <span class="math inline">\(k\)</span> is the best model for prediction among the candidate set, given the data and assuming one of the models is correct.</p>
+<p><em>Interpretation</em>: The weight <span class="math inline">\(w_k\)</span> can be interpreted as the probability that model <span class="math inline">\(k\)</span> is the best model for prediction among the candidate set, given the data and assuming one of the models is correct.</p>
 <p>Models with <span class="math inline">\(\Delta_k = 0\)</span> (the best model) receive the highest weight. Models with large <span class="math inline">\(\Delta_k\)</span> receive weight approaching zero.</p>
 </section>
 <section id="properties-of-akaike-weights" class="slide level2">
 <h2>Properties of Akaike Weights</h2>
-<h3 id="weights-sum-to-one">Weights sum to one</h3>
-<p>By construction, <span class="math inline">\(\sum_{k=1}^{K} w_k = 1\)</span>.</p>
+<p><em>Weights sum to one</em>: By construction, <span class="math inline">\(\sum_{k=1}^{K} w_k = 1\ \)</span>.</p>
 <p>This ensures the weighted average is a convex combination of model predictions.</p>
-<h3 id="exponential-decay">Exponential decay</h3>
-<p>Weight decreases exponentially with <span class="math inline">\(\Delta_k\)</span>.</p>
+<p><em>Exponential decay</em>: Weight decreases exponentially with <span class="math inline">\(\Delta_k\)</span>.</p>
 <p>When <span class="math inline">\(\Delta_k = 2\)</span>, the model receives weight approximately <span class="math inline">\(1/e \approx 0.37\)</span> times the weight of the best model. When <span class="math inline">\(\Delta_k = 10\)</span>, the model receives weight approximately <span class="math inline">\(0.007\)</span> times the weight of the best model.</p>
-<p>This means models with <span class="math inline">\(\Delta_k &gt; 10\)</span> contribute negligibly to the average.</p>
-<h3 id="relative-support">Relative support</h3>
-<p>The weight ratio <span class="math inline">\(w_k / w_j = \exp[(\Delta_j - \Delta_k)/2]\)</span> measures the relative support for model <span class="math inline">\(k\)</span> versus model <span class="math inline">\(j\)</span>.</p>
-<p>If <span class="math inline">\(\Delta_k = 0\)</span> and <span class="math inline">\(\Delta_j = 4\)</span>, then <span class="math inline">\(w_k / w_j = \exp(2) \approx 7.4\)</span>, meaning model <span class="math inline">\(k\)</span> has about 7 times the support of model <span class="math inline">\(j\)</span>.</p>
+<p>This means models with <span class="math inline">\(\Delta_k &gt; 10\ \)</span> contribute negligibly to the average.</p>
+<p><em>Relative support</em>: The weight ratio <span class="math inline">\(w_k / w_j = \exp[(\Delta_j - \Delta_k)/2]\ \)</span> measures the relative support for model <span class="math inline">\(k\)</span> versus model <span class="math inline">\(j\)</span>. If <span class="math inline">\(\Delta_k = 0\)</span> and <span class="math inline">\(\Delta_j = 4\)</span>, then <span class="math inline">\(w_k / w_j = \exp(2) \approx 7.4\ \ \)</span>, meaning model <span class="math inline">\(k\)</span> has about 7 times the support of model <span class="math inline">\(j\)</span>.</p>
 </section>
 <section id="example-three-competitive-models" class="slide level2">
 <h2>Example: Three Competitive Models</h2>
 <p>Suppose we have three models with AIC values:</p>
 <p><span class="math display">\[\text{AIC}_1 = 450.2, \quad \text{AIC}_2 = 451.8, \quad \text{AIC}_3 = 455.0\]</span></p>
-<h3 id="compute-differences">Compute differences</h3>
-<p><span class="math display">\[\Delta_1 = 0, \quad \Delta_2 = 1.6, \quad \Delta_3 = 4.8\]</span></p>
-<h3 id="compute-weights">Compute weights</h3>
+<p><em>Compute differences</em>: <span class="math display">\[\Delta_1 = 0, \quad \Delta_2 = 1.6, \quad \Delta_3 = 4.8\]</span></p>
+<p><em>Compute weights</em>:</p>
 <p><span class="math display">\[w_1 = \frac{\exp(0)}{\exp(0) + \exp(-0.8) + \exp(-2.4)} = \frac{1}{1 + 0.449 + 0.091} = 0.650\]</span></p>
 <p><span class="math display">\[w_2 = \frac{\exp(-0.8)}{1.540} = 0.292\]</span></p>
 <p><span class="math display">\[w_3 = \frac{\exp(-2.4)}{1.540} = 0.059\]</span></p>
@@ -192,18 +184,15 @@
 </section>
 <section id="when-to-use-model-averaging" class="slide level2">
 <h2>When to Use Model Averaging</h2>
-<h3 id="when-multiple-models-have-similar-support">When multiple models have similar support</h3>
-<p>If several models have <span class="math inline">\(\Delta \text{AIC} &lt; 2\)</span>, they are empirically indistinguishable. Selecting one arbitrarily discards information. Model averaging incorporates all competitive models.</p>
-<h3 id="when-model-uncertainty-is-important">When model uncertainty is important</h3>
-<p>If the goal is prediction with honest uncertainty quantification, model averaging accounts for both parameter uncertainty (within each model) and model uncertainty (across models).</p>
-<p>Standard errors from a single selected model underestimate true uncertainty.</p>
-<h3 id="when-model-interpretation-is-secondary">When model interpretation is secondary</h3>
-<p>Model averaging produces better predictions but complicates interpretation. The averaged predictions do not correspond to any single model. If the goal is to identify a single parsimonious model for interpretation, selection may be preferred.</p>
+<p><em>When multiple models have non-trivial evidential support</em>:</p>
+<p>If several models have <span class="math inline">\(\Delta \text{AIC} &lt; 2\ \)</span>, they are empirically indistinguishable. Selecting one arbitrarily discards information. Model averaging incorporates all competitive models.</p>
+<p><em>When model uncertainty is important</em>: If the goal is prediction with honest uncertainty quantification, model averaging accounts for both parameter uncertainty (within each model) and model uncertainty (across models).</p>
+<p><em>When model interpretation is secondary</em>: Model averaging produces better predictions but complicates interpretation. The averaged predictions do not correspond to any single model. If the goal is to identify a single parsimonious model for interpretation, selection may be preferred.</p>
 </section>
 <section id="when-not-to-use-model-averaging" class="slide level2">
-<h2>When NOT to Use Model Averaging</h2>
+<h2>When not to Use Model Averaging</h2>
 <h3 id="when-one-model-dominates">When one model dominates</h3>
-<p>If the best model has <span class="math inline">\(\Delta_k &gt; 10\)</span> for all other models, that model receives nearly all weight. Model averaging reduces to single-model selection.</p>
+<p>If the best model has <span class="math inline">\(\Delta_k &gt; 10\ \)</span> for all other models, that model receives nearly all weight. Model averaging reduces to single-model selection.</p>
 <h3 id="when-interpretability-is-paramount">When interpretability is paramount</h3>
 <p>Averaged coefficients or predictions do not correspond to a coherent mechanistic model. For scientific inference about specific mechanisms, a single interpretable model may be preferred.</p>
 <h3 id="when-computational-cost-is-prohibitive">When computational cost is prohibitive</h3>
@@ -214,11 +203,9 @@
 <p>For a new observation <span class="math inline">\(x_0\)</span>, the model-averaged prediction is:</p>
 <p><span class="math display">\[\hat{y}_{\text{avg}}(x_0) = \sum_{k=1}^{K} w_k \cdot \hat{y}_k(x_0)\]</span></p>
 <p>where <span class="math inline">\(\hat{y}_k(x_0)\)</span> is the prediction from model <span class="math inline">\(k\)</span> fitted to the full data.</p>
-<h3 id="variance">Variance</h3>
 <p>The variance of the model-averaged prediction accounts for both parameter uncertainty and model uncertainty:</p>
 <p><span class="math display">\[\text{Var}(\hat{y}_{\text{avg}}(x_0)) = \sum_{k=1}^{K} w_k \left[ \text{Var}(\hat{y}_k(x_0)) + (\hat{y}_k(x_0) - \hat{y}_{\text{avg}}(x_0))^2 \right]\]</span></p>
 <p>The first term is the weighted average of within-model variances. The second term captures the variability in predictions across models.</p>
-<p>This variance is typically larger than the variance from any single selected model.</p>
 </section>
 <section id="model-averaged-coefficients" class="slide level2">
 <h2>Model-Averaged Coefficients</h2>
@@ -235,12 +222,10 @@
 <h2>Confidence Sets</h2>
 <p>Rather than selecting a single “best” model, we can identify a confidence set of models.</p>
 <p>A 95% confidence set contains models whose cumulative Akaike weight sums to 0.95.</p>
-<h3 id="procedure">Procedure</h3>
-<p>Rank models by AIC (or equivalently, by descending weight <span class="math inline">\(w_k\)</span>). Include models sequentially until their cumulative weight reaches 0.95:</p>
+<p><em>Procedure</em>: Rank models by AIC (or equivalently, by descending weight <span class="math inline">\(w_k\)</span>). Include models sequentially until their cumulative weight reaches 0.95:</p>
 <p><span class="math display">\[\sum_{k \in \mathcal{S}} w_k \geq 0.95\]</span></p>
 <p>The confidence set <span class="math inline">\(\mathcal{S}\)</span> contains the smallest collection of models accounting for 95% of the total weight.</p>
-<h3 id="interpretation-1">Interpretation</h3>
-<p>These are the models with substantial empirical support. Any model outside this set has negligible support given the data.</p>
+<p><em>Interpretation</em>: These are the models with substantial empirical support. Any model outside this set has negligible support given the data.</p>
 </section>
 <section id="example-confidence-set" class="slide level2">
 <h2>Example: Confidence Set</h2>
@@ -260,7 +245,7 @@
 <h3 id="model-selection">Model selection</h3>
 <p>Choose model <span class="math inline">\(k^*\)</span> with minimum AIC. Use only <span class="math inline">\(\hat{y}_{k^*}(x_0)\)</span> for predictions. Inference conditions on the selected model. Simpler to interpret: a single model with specific predictors.</p>
 <h3 id="model-averaging">Model averaging</h3>
-<p>Compute weighted average <span class="math inline">\(\hat{y}_{\text{avg}}(x_0) = \sum_k w_k \hat{y}_k(x_0)\)</span>. Predictions incorporate information from all competitive models. Inference accounts for model uncertainty. Better prediction performance when multiple models have similar support.</p>
+<p>Compute weighted average <span class="math inline">\(\hat{y}_{\text{avg}}(x_0) = \sum_k w_k \hat{y}_k(x_0)\ \ \)</span>. Predictions incorporate information from all competitive models. Inference accounts for model uncertainty. Better prediction performance when multiple models have similar support.</p>
 <h3 id="empirical-evidence">Empirical evidence</h3>
 <p>Simulation studies show model averaging often improves prediction accuracy compared to single-model selection, especially when model uncertainty is high.</p>
 </section>
@@ -275,14 +260,10 @@
 </section>
 <section id="limitations-and-caveats" class="slide level2">
 <h2>Limitations and Caveats</h2>
-<h3 id="the-candidate-set-matters">The candidate set matters</h3>
-<p>Model averaging cannot compensate for a poorly chosen candidate set. If all models are badly misspecified, averaging will not improve predictions. The candidate set should be theoretically motivated, not an exhaustive search.</p>
-<h3 id="computational-cost">Computational cost</h3>
-<p>Fitting all <span class="math inline">\(2^p\)</span> subsets is infeasible for large <span class="math inline">\(p\)</span>. Regularization (Session 4) is more scalable for high-dimensional problems.</p>
-<h3 id="not-a-panacea-for-selection-bias">Not a panacea for selection bias</h3>
-<p>Model averaging reduces but does not eliminate selection bias. If models are data-selected (e.g., via stepwise), averaging them does not fix the underlying problem.</p>
-<h3 id="interpretation-complexity">Interpretation complexity</h3>
-<p>Averaged coefficients do not correspond to a single causal model. This complicates scientific interpretation and mechanistic understanding.</p>
+<p><em>The candidate set matters</em>: Model averaging cannot compensate for a poorly chosen candidate set. If all models are badly misspecified, averaging will not improve predictions. The candidate set should be theoretically motivated, not an exhaustive search.</p>
+<p><em>Computational cost</em>: Fitting all <span class="math inline">\(2^p\)</span> subsets is infeasible for large <span class="math inline">\(p\)</span>. Regularization (Session 4) is more scalable for high-dimensional problems.</p>
+<p><em>Not a panacea for selection bias</em>: Model averaging reduces but does not eliminate selection bias. If models are data-selected (e.g., via stepwise), averaging them does not fix the underlying problem.</p>
+<p><em>Interpretation complexity</em>: Averaged coefficients do not correspond to a single causal model. This complicates scientific interpretation and mechanistic understanding.</p>
 </section>
 <section id="aic-vs.-bic-for-weights" class="slide level2">
 <h2>AIC vs.&nbsp;BIC for Weights</h2>
@@ -293,21 +274,13 @@
 <p>BIC penalizes complexity more heavily than AIC. BIC weights tend to concentrate more on a single best model. AIC weights spread more evenly across competitive models.</p>
 <p>The choice depends on the goal: AIC for prediction, BIC for parsimony.</p>
 </section>
-<section id="combining-model-averaging-with-cross-validation" class="slide level2">
-<h2>Combining Model Averaging with Cross-Validation</h2>
-<p>We can validate model-averaged predictions using cross-validation.</p>
-<h3 id="procedure-1">Procedure</h3>
-<p>Split data into training and test sets. Fit all candidate models on training data. Compute Akaike weights based on training data. Form model-averaged prediction for test data: <span class="math inline">\(\hat{y}_{\text{avg}}(x_{\text{test}}) = \sum_k w_k \hat{y}_k(x_{\text{test}})\)</span>. Compare test error of averaged predictions versus single-model predictions.</p>
-<p>This assesses whether model averaging improves out-of-sample performance.</p>
-<p>Empirical studies typically show model averaging equals or outperforms single-model selection on test data.</p>
-</section>
 <section id="variable-importance" class="slide level2">
 <h2>Variable Importance</h2>
 <p>Model averaging provides a natural measure of variable importance.</p>
 <p>For predictor <span class="math inline">\(x_j\)</span>, define:</p>
 <p><span class="math display">\[I(x_j) = \sum_{k: x_j \in \mathcal{M}_k} w_k\]</span></p>
 <p>This is the sum of weights over all models that include <span class="math inline">\(x_j\)</span>.</p>
-<h3 id="interpretation-2">Interpretation</h3>
+<h3 id="interpretation">Interpretation</h3>
 <p><span class="math inline">\(I(x_j) = 1\)</span> means <span class="math inline">\(x_j\)</span> appears in all competitive models (strong evidence for inclusion). <span class="math inline">\(I(x_j) \approx 0\)</span> means <span class="math inline">\(x_j\)</span> appears only in models with negligible weight (weak evidence). <span class="math inline">\(0 &lt; I(x_j) &lt; 1\)</span> indicates uncertainty about whether <span class="math inline">\(x_j\)</span> should be included.</p>
 <p>This measure is more informative than binary inclusion/exclusion from a single selected model.</p>
 </section>
@@ -318,7 +291,7 @@
 <h3 id="next-session">Next session</h3>
 <p>We will cover special topics including model selection for mixed models, the distinction between prediction, explanation, and causation, and best practices for transparent reporting of model selection.</p>
 <h3 id="key-concepts-established">Key concepts established</h3>
-<p>Model averaging acknowledges model uncertainty by weighting predictions across competitive models. Akaike weights measure relative empirical support for each model. Model averaging often improves prediction compared to single-model selection. The confidence set contains models accounting for 95% of cumulative weight. Model-averaged coefficients and variable importance measures provide richer inference than single-model selection.</p>
+<p>Akaike weights measure relative empirical support for each model. Model averaging often improves prediction compared to single-model selection. The confidence set contains models accounting for 95% of cumulative weight. Model-averaged coefficients and variable importance measures provide richer inference than single-model selection.</p>
 
 </section>
     </div>
