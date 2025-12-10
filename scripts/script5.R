@@ -22,3 +22,26 @@ mtcars_models[[1]] |> predict(new_car)
 mtcars_models[[2]] |> predict(new_car)
 
 model_averaged_prediction(mtcars_models, comparison, new_car)
+
+variable_importance(mtcars_models, comparison)
+
+# Model averaging with MuMIn ----------------------------------------------
+library(MuMIn)
+library(AmesHousing)
+
+ames <- make_ames()
+
+ames_full <- lm(
+  Sale_Price ~
+    Year_Built +
+    Year_Remod_Add +
+    Gr_Liv_Area +
+    Full_Bath +
+    Bedroom_AbvGr +
+    TotRms_AbvGrd +
+    Garage_Cars,
+  data = ames,
+  na.action = na.fail
+)
+
+ames_all <- dredge(ames_full, rank = "AIC")
