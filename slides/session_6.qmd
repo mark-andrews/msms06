@@ -95,8 +95,6 @@ Fit both with ML, compute AIC, and compare.
 
 ## Selecting Random Effects in Mixed Models
 
-### The problem
-
 Comparing random effects structures is more complex.
 
 The null hypothesis that a variance component equals zero is on the boundary of the parameter space.
@@ -107,8 +105,6 @@ The asymptotic $\chi^2$ distribution for the LRT does not hold.
 Use the likelihood ratio test with a boundary-corrected p-value: divide the LRT p-value by 2.
 Use AIC or BIC, which do not require distributional assumptions.
 Use model selection criteria designed for mixed models, such as conditional AIC.
-
-### Practical advice
 
 Start with a maximal random effects structure justified by the design.
 Only simplify if there is strong evidence (large $\Delta \text{AIC}$) that simpler structure is adequate.
@@ -139,21 +135,15 @@ In practice, standard AIC based on the marginal likelihood (the default in lme4,
 
 These are three distinct goals of modeling, each requiring different approaches to model selection.
 
-### Prediction
-
-Goal: Minimize out-of-sample prediction error.
+*Prediction*: Goal is to minimize out-of-sample prediction error.
 Criterion: Cross-validated prediction accuracy, AIC.
 Interpretation: Coefficients are not necessarily meaningful; focus is on accurate predictions.
 
-### Explanation
-
-Goal: Identify variables associated with the outcome.
-Criterion: AICc, parsimony, interpretability.
+*Explanation*: Goal: Identify variables associated with the outcome.
+Criterion: Parsimony, interpretability.
 Interpretation: Coefficients describe associations but not causal effects.
 
-### Causation
-
-Goal: Estimate causal effects of interventions.
+*Causation*: Goal: Estimate causal effects of interventions.
 Criterion: Subject-matter knowledge, causal diagrams, avoiding confounding bias.
 Interpretation: Coefficients represent causal effects under assumptions.
 
@@ -162,8 +152,6 @@ Interpretation: Coefficients represent causal effects under assumptions.
 ## Model Selection for Prediction
 
 When the goal is prediction, model selection should minimize expected prediction error.
-
-### Appropriate methods
 
 Use cross-validation to estimate out-of-sample error.
 Use AIC or AICc to approximate prediction error.
@@ -189,11 +177,7 @@ If a predictor improves prediction, include it regardless of theoretical justifi
 
 When the goal is explanation, model selection should identify a parsimonious set of variables that describe the outcome.
 
-### Appropriate methods
-
-Use AICc to balance fit and parsimony.
-Consider BIC if the true model is believed to be among candidates.
-Report all competitive models with $\Delta \text{AIC} < 2$.
+Report all competitive models with $\Delta \text{AIC} < 2\ $.
 Use model averaging to compute variable importance.
 
 ### What matters
@@ -212,10 +196,6 @@ Confounders may bias coefficient estimates even in a well-fitting model.
 
 ## Model Selection for Causation
 
-When the goal is causal inference, model selection must address confounding.
-
-### The fundamental problem
-
 Causal inference requires controlling for confounders but not colliders or mediators.
 Purely statistical model selection (AIC, stepwise) can select models that induce confounding bias.
 A model with good predictive fit may have severely biased causal effect estimates.
@@ -231,7 +211,6 @@ Use sensitivity analyses to assess robustness to unmeasured confounding.
 
 Correct specification of confounders.
 Avoiding selection of colliders or mediators.
-
 Statistical fit (AIC, $R^2$) is not the primary criterion for causal models.
 
 ---
@@ -278,7 +257,6 @@ Example: Estimate effect of exercise program on health outcomes.
 
 A model that predicts well may be a terrible causal model.
 A model that estimates causal effects well may predict poorly.
-
 Researchers must be clear about the goal and choose methods accordingly.
 
 ---
@@ -291,7 +269,7 @@ Transparent reporting is essential for reproducibility and to avoid misleading r
 
 The candidate set of models considered.
 The model selection criterion used (e.g., AICc, cross-validation).
-All models with $\Delta \text{AIC} < 2$ or in the 95% confidence set.
+All models with $\Delta \text{AIC} < 2\ $ or in the 95% confidence set.
 Whether the candidate set was pre-specified or data-driven.
 
 ### What not to do
@@ -307,7 +285,7 @@ Use stepwise selection and present the final model as if it were pre-specified.
 
 ### Poor reporting
 
-"We used stepwise regression to select the best model. The final model included predictors $A$, $B$, and $C$ (all $p < 0.05$)."
+"We used stepwise regression to select the best model. The final model included predictors $A$, $B$, and $C$ (all $p < 0.05\ $)."
 
 This does not disclose:
 - How many models were considered.
@@ -317,7 +295,7 @@ This does not disclose:
 
 ### Good reporting
 
-"We compared 12 candidate models using AICc. The best model included $A$, $B$, and $C$ ($\Delta \text{AICc} = 0$, weight = 0.48). Two additional models had $\Delta \text{AICc} < 2$ (see Table 1). We report model-averaged coefficients to account for model uncertainty. Standard errors reflect both parameter and model uncertainty."
+"We compared 12 candidate models using AICc. The best model included $A$, $B$, and $C$ ($\Delta \text{AICc} = 0\ $, weight = 0.48). Two additional models had $\Delta \text{AICc} < 2$ (see Table 1). We report model-averaged coefficients to account for model uncertainty. Standard errors reflect both parameter and model uncertainty."
 
 This discloses the selection process and acknowledges uncertainty.
 
@@ -334,17 +312,6 @@ A model comparison table should include:
 - $\Delta \text{AIC}$
 - Akaike weight
 - Cumulative weight (optional)
-
-### Example table
-
-| Model | k | Log-Lik | AICc | Δ AICc | Weight | Cumulative |
-|-------|---|---------|------|--------|--------|------------|
-| M3    | 5 | -120.3  | 250.9 | 0.0   | 0.52   | 0.52       |
-| M2    | 4 | -121.5  | 251.2 | 0.3   | 0.45   | 0.97       |
-| M4    | 6 | -120.1  | 252.5 | 1.6   | 0.23   | 1.00       |
-| M1    | 3 | -125.8  | 257.7 | 6.8   | 0.02   | 1.00       |
-
-Models M3, M2, and M4 are in the 95% confidence set.
 
 ---
 
@@ -384,8 +351,6 @@ Simple cross-validation (without nesting) is invalid when used for both selectio
 
 ## Reporting Uncertainty After Selection
 
-### The problem
-
 Standard errors and confidence intervals from a selected model are too narrow.
 P-values are too small because they do not account for the search process.
 
@@ -404,70 +369,11 @@ Do not over-interpret p-values or confidence intervals from selected models.
 
 ---
 
-## The Replication Crisis and Model Selection
-
-Many published findings fail to replicate.
-
-One major cause is data-driven model selection combined with selective reporting.
-
-### The mechanism
-
-Researchers fit many models.
-They report the model with the best fit or most "interesting" results.
-P-values and effect sizes are inflated due to selection.
-Subsequent studies with independent data do not replicate the findings.
-
-### The solution
-
-Transparent reporting of all models considered.
-Pre-registration of model selection strategy.
-Validation on independent data.
-Acknowledging model uncertainty through model averaging or confidence sets.
-
-These practices improve the reliability and reproducibility of empirical research.
-
----
-
-## Summary: Integrating Model Selection into Research
-
-### For prediction
-
-Use cross-validation and AIC to minimize prediction error.
-Consider regularization for high-dimensional problems.
-Use model averaging to improve prediction and quantify uncertainty.
-
-### For explanation
-
-Use AICc to identify parsimonious models with empirical support.
-Report all competitive models, not just the "winner."
-Use model-averaged coefficients and variable importance.
-
-### For causation
-
-Use subject-matter knowledge and causal diagrams to specify models.
-Do not rely on AIC or statistical selection.
-Include confounders; avoid conditioning on mediators or colliders.
-
-### For transparency
-
-Report the candidate set, selection criterion, and all competitive models.
-Acknowledge when selection is data-driven.
-Validate selected models on independent data when possible.
-
----
-
 ## Looking Ahead
 
 ### This workshop
 
 We covered six sessions on model selection and model simplification.
-
-Session 1 introduced the bias-variance tradeoff and the overfitting problem.
-Session 2 covered cross-validation and information criteria for estimating out-of-sample error.
-Session 3 addressed frameworks for comparing models, including likelihood ratio tests and $\Delta \text{AIC}$.
-Session 4 examined variable selection methods, including stepwise, all-subsets, and regularization.
-Session 5 introduced model averaging as an alternative to single-model selection.
-Session 6 addressed mixed models, prediction versus causation, and transparent reporting.
 
 ### Key principles
 
@@ -479,16 +385,3 @@ The goal of modeling (prediction, explanation, causation) determines the appropr
 Transparent reporting of model selection is essential for reproducibility.
 
 ---
-
-## Final Recommendations
-
-Use theory and prior knowledge to define a small candidate set.
-Do not fit all possible models or use stepwise selection for final inference.
-Report all models with $\Delta \text{AIC} < 2$, not just the "best" one.
-Use model averaging when multiple models are competitive.
-For causal inference, rely on subject-matter knowledge rather than statistical selection.
-Validate selected models on independent data when possible.
-Be transparent about the model selection process in publications.
-Pre-register model selection strategies to reduce selective reporting.
-
-Following these principles will improve the rigor, transparency, and reproducibility of empirical research using statistical models.

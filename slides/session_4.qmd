@@ -109,8 +109,6 @@ It is exploration, not confirmation.
 
 ## Demonstrating Stepwise Instability
 
-### Setup
-
 Generate data where no predictors are truly related to the outcome.
 Fit forward stepwise selection based on AIC.
 
@@ -220,8 +218,6 @@ The penalty is $\lambda \|\beta\|_1 = \lambda \sum_{j=1}^{p}|\beta_j|$.
 
 Lasso performs both shrinkage and selection.
 It sets some coefficients exactly to zero, producing a sparse model.
-The L1 penalty has a geometric property that induces sparsity: the constraint region has corners where some coefficients equal zero.
-Lasso does not have a closed-form solution and requires iterative optimization.
 
 ### When to use lasso
 
@@ -260,7 +256,7 @@ We select $\lambda$ by cross-validation.
 
 ### Procedure
 
-Specify a grid of candidate $\lambda$ values, such as $\lambda \in \{0.001, 0.01, 0.1, 1, 10, 100\}$.
+Specify a grid of candidate $\lambda$ values, such as $\lambda \in \{0.001, 0.01, 0.1, 1, 10, 100\}\ \ $.
 For each $\lambda$, compute k-fold cross-validation error.
 Select $\lambda$ that minimizes CV error.
 Refit the model on the full data using the selected $\lambda$.
@@ -268,6 +264,23 @@ Refit the model on the full data using the selected $\lambda$.
 This approach estimates out-of-sample performance for each $\lambda$ and selects the value that balances bias and variance optimally.
 
 ---
+
+## Coefficient Paths
+
+A useful diagnostic is to plot coefficient estimates as a function of $\lambda$.
+
+For lasso and elastic net, this shows:
+- Which predictors enter the model first (at small $\lambda$).
+- Which predictors remain in the model at moderate $\lambda$.
+- How coefficients shrink continuously as $\lambda$ increases.
+
+Variables that enter early and remain stable across a range of $\lambda$ are more reliable.
+Variables that enter late or are unstable are likely noise.
+
+We will construct these plots in the workshop using the glmnet package.
+
+---
+
 
 ## Comparing Methods
 
@@ -296,44 +309,23 @@ Introduces bias but reduces variance, improving prediction.
 
 ## Practical Recommendations
 
-### When $p$ is small ($p < 10$)
+### When $p$ is small ($p < 10\ $)
 
 Use all-subsets selection with AICc.
 Report all competitive models with $\Delta \text{AICc} < 2$.
 Consider model averaging (Session 5).
 
-### When $p$ is moderate ($10 < p < 30$)
+### When $p$ is moderate ($10 < p < 30\ $)
 
 Use lasso or elastic net with cross-validation.
 Examine the stability of selected variables by repeating on bootstrap samples.
 Report coefficient paths showing how selection changes with $\lambda$.
 
-### When $p$ is large ($p > 30$) or $p > n$
+### When $p$ is large ($\ p > 30\ $) or $p > n$
 
 Use elastic net with cross-validation.
 Interpret selected variables cautiously: selection is unstable.
 Focus on prediction performance rather than inference.
-
-### Never
-
-Do not use stepwise selection for inference.
-Do not report p-values from a stepwise-selected model without acknowledging selection bias.
-
----
-
-## Coefficient Paths
-
-A useful diagnostic is to plot coefficient estimates as a function of $\lambda$.
-
-For lasso and elastic net, this shows:
-- Which predictors enter the model first (at small $\lambda$).
-- Which predictors remain in the model at moderate $\lambda$.
-- How coefficients shrink continuously as $\lambda$ increases.
-
-Variables that enter early and remain stable across a range of $\lambda$ are more reliable.
-Variables that enter late or are unstable are likely noise.
-
-We will construct these plots in the workshop using the glmnet package.
 
 ---
 
